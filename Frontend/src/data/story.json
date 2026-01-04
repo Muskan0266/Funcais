@@ -1,0 +1,174 @@
+[
+    {
+        "id": 1,
+        "name": "Le Café du Matin",
+        "time": "1.2 min",
+        "audio": "/audio/story1.mp3",
+        "text_fr": "Le petit café parisien était déjà rempli lorsque Camille est arrivée ce matin-là. L'odeur du café chaud se mélangeait à celle des croissants sortant du four. Le serveur saluait les clients avec un sourire chaleureux. Camille s'est installée près de la fenêtre, où elle pouvait regarder les passants se dépêcher pour aller au travail. Elle aimait observer la ville s'éveiller. En attendant sa boisson, elle a commencé à lire son livre préféré. Quand son cappuccino est arrivé, elle a pris une première gorgée et a immédiatement ressenti une sensation de confort. C'était son moment préféré de la journée : un instant de calme avant le rythme rapide de la vie parisienne.",
+        "text_en": "The small Parisian café was already full when Camille arrived that morning. The smell of hot coffee mixed with the scent of freshly baked croissants. The waiter greeted customers with a warm smile. Camille sat near the window, where she could watch people hurrying to work. She liked observing the city waking up. While waiting for her drink, she began reading her favorite book. When her cappuccino arrived, she took the first sip and immediately felt comfort wash over her. It was her favorite moment of the day: a moment of calm before the fast rhythm of Parisian life.",
+        "questions": [
+            {
+                "id": 1,
+                "type": "mcq",
+                "question": "Où s'assoit Camille ?",
+                "options": [
+                    "Au centre du café",
+                    "Près de la fenêtre",
+                    "À côté du serveur"
+                ],
+                "answer": "Près de la fenêtre"
+            },
+            {
+                "id": 2,
+                "type": "mcq",
+                "question": "Quel est l'odeur principale dans le café ?",
+                "options": [
+                    "Du chocolat chaud",
+                    "Du café et des croissants",
+                    "Des fleurs"
+                ],
+                "answer": "Du café et des croissants"
+            },
+            {
+                "id": 3,
+                "type": "mcq",
+                "question": "Que fait Camille en attendant sa boisson ?",
+                "options": [
+                    "Elle écrit",
+                    "Elle lit un livre",
+                    "Elle parle avec le serveur"
+                ],
+                "answer": "Elle lit un livre"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "La Promenade au Parc",
+        "time": "1 min",
+        "audio": "/audio/story2.mp3",
+        "text_fr": "Un dimanche matin, Thomas a décidé de faire une promenade dans le parc près de chez lui. Le soleil brillait doucement à travers les arbres et un vent léger rafraîchissait l'air. Il a croisé des familles qui pique-niquaient, des enfants jouant au ballon et quelques joggeurs motivés. Thomas s'est arrêté près du lac pour regarder les canards glisser calmement sur l'eau. Il a aussi entendu un musicien jouer de la guitare sous un grand chêne, ce qui rendait l'atmosphère encore plus agréable. Après une heure de marche, Thomas se sentait reposé et prêt à commencer sa journée.",
+        "text_en": "One Sunday morning, Thomas decided to take a walk in the park near his home. The sun shone gently through the trees and a light breeze cooled the air. He passed families having picnics, children playing ball, and a few motivated joggers. Thomas stopped near the lake to watch ducks gliding peacefully on the water. He also heard a musician playing guitar under a large oak tree, which made the atmosphere even more pleasant. After an hour of walking, Thomas felt relaxed and ready to start his day.",
+        "questions": [
+            {
+                "id": 1,
+                "type": "mcq",
+                "question": "Que voyait Thomas près du lac ?",
+                "options": [
+                    "Des poissons",
+                    "Des canards",
+                    "Des cygnes"
+                ],
+                "answer": "Des canards"
+            },
+            {
+                "id": 2,
+                "type": "mcq",
+                "question": "Qui jouait de la guitare dans le parc ?",
+                "options": [
+                    "Un enfant",
+                    "Un joggeur",
+                    "Un musicien"
+                ],
+                "answer": "Un musicien"
+            },
+            {
+                "id": 3,
+                "type": "mcq",
+                "question": "Comment Thomas se sent-il après sa promenade ?",
+                "options": [
+                    "Stressé",
+                    "Fatigué",
+                    "Reposé"
+                ],
+                "answer": "Reposé"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "name": "Le Voyage en Train",
+        "time": "1.3 min",
+        "audio": "/audio/story3.mp3",
+        "text_fr": "Marie prenait le train pour aller voir sa grand-mère qui vivait à la campagne. Le train roulait doucement à travers des champs et de petits villages. Par la fenêtre, elle voyait des prairies vertes, des chevaux courant librement et des maisons en pierre. Assise confortablement, Marie écoutait de la musique tout en observant le paysage. Un homme à côté d'elle lisait un journal. Pendant le trajet, une annonce informa les passagers qu'un léger retard était prévu à cause de travaux sur la voie. Cela ne dérangeait pas Marie, car elle aimait ce moment de tranquillité. Elle avait hâte de retrouver sa grand-mère et de partager un bon repas avec elle.",
+        "text_en": "Marie was taking the train to visit her grandmother who lived in the countryside. The train moved slowly through fields and small villages. Through the window, she saw green meadows, horses running freely, and stone houses. Comfortably seated, Marie listened to music while observing the scenery. A man next to her was reading a newspaper. During the trip, an announcement informed passengers that a slight delay was expected due to construction work on the tracks. Marie didn't mind, as she enjoyed this moment of peace. She looked forward to seeing her grandmother and sharing a good meal with her.",
+        "questions": [
+            {
+                "id": 1,
+                "type": "mcq",
+                "question": "Où va Marie ?",
+                "options": [
+                    "Chez sa sœur",
+                    "À la campagne",
+                    "À la mer"
+                ],
+                "answer": "À la campagne"
+            },
+            {
+                "id": 2,
+                "type": "mcq",
+                "question": "Pourquoi le train a-t-il du retard ?",
+                "options": [
+                    "Mauvais temps",
+                    "Travaux sur la voie",
+                    "Problème technique"
+                ],
+                "answer": "Travaux sur la voie"
+            },
+            {
+                "id": 3,
+                "type": "mcq",
+                "question": "Que fait l'homme à côté de Marie ?",
+                "options": [
+                    "Il dort",
+                    "Il lit un journal",
+                    "Il écoute de la musique"
+                ],
+                "answer": "Il lit un journal"
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Le Marché du Samedi",
+        "time": "1 min",
+        "audio": "/audio/story4.mp3",
+        "text_fr": "Chaque samedi matin, Léa aimait aller au marché du centre-ville. Les étals étaient remplis de fruits colorés, de légumes frais et de fleurs parfumées. Les vendeurs discutaient joyeusement avec les clients. Léa achetait souvent des fraises, des tomates et parfois un bouquet de tulipes. Elle adorait l'ambiance vivante du marché : les rires, les odeurs, les conversations. Ce samedi-là, elle a rencontré un ami d'enfance qu'elle n'avait pas vu depuis longtemps. Ils ont parlé quelques minutes puis Léa a continué ses achats. Elle est rentrée chez elle avec un panier rempli et un grand sourire.",
+        "text_en": "Every Saturday morning, Léa loved going to the downtown market. The stalls were filled with colorful fruits, fresh vegetables, and fragrant flowers. The vendors chatted happily with the customers. Léa often bought strawberries, tomatoes, and sometimes a bouquet of tulips. She loved the lively atmosphere of the market: the laughter, the smells, the conversations. That Saturday, she met a childhood friend she hadn't seen in a long time. They talked for a few minutes and then Léa continued her shopping. She returned home with a full basket and a big smile.",
+        "questions": [
+            {
+                "id": 1,
+                "type": "mcq",
+                "question": "Qu'est-ce que Léa achète souvent ?",
+                "options": [
+                    "Du pain",
+                    "Des fraises et des tomates",
+                    "Des pommes"
+                ],
+                "answer": "Des fraises et des tomates"
+            },
+            {
+                "id": 2,
+                "type": "mcq",
+                "question": "Qui Léa rencontre-t-elle au marché ?",
+                "options": [
+                    "Une voisine",
+                    "Un ami d'enfance",
+                    "Son professeur"
+                ],
+                "answer": "Un ami d'enfance"
+            },
+            {
+                "id": 3,
+                "type": "mcq",
+                "question": "Quel type d'ambiance Léa préfère-t-elle ?",
+                "options": [
+                    "Silencieuse",
+                    "Vivante",
+                    "Triste"
+                ],
+                "answer": "Vivante"
+            }
+        ]
+    }
+]
