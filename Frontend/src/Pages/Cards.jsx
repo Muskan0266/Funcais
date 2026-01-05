@@ -9,10 +9,36 @@ import laptop from '../images/laptop.png'
 import sofa from '../images/sofa.png'
 import StudyTime from '../components/StudyTime'
 
+const getCookie = (name) => {
+    const match = document.cookie.match(
+        new RegExp("(^| )" + name + "=([^;]+)")
+    )
+    return match ? decodeURIComponent(match[2]) : null
+}
+
+const setCookie = (name, value, days = 365) => {
+    const expires = new Date()
+    expires.setDate(expires.getDate() + days)
+
+    document.cookie =
+        `${name}=${encodeURIComponent(value)};` +
+        `expires=${expires.toUTCString()};path=/;SameSite=Lax`
+}
+
+const removeCookie = (name) => {
+    document.cookie =
+        `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;SameSite=Lax`
+}
+
 const Cards = () => {
     const { studyMinutes } = StudyTime()
 
-    const savedData = JSON.parse(localStorage.getItem('progress')) || {}
+    let savedData = {}
+    try {
+        savedData = JSON.parse(getCookie("progress") || "{}")
+    } catch {
+        savedData = {}
+    }
 
     const [currentIndex, setCurrentIndex] = useState(savedData.currentIndex ?? 0)
     const [flashColor, setFlashColor] = useState("")
@@ -26,14 +52,14 @@ const Cards = () => {
     const [cardsChallenge, setcardsChallenge] = useState(false)
 
     const cards = [
-        { img: bathtub, name: "Le frigo", correctName: "La baignore", margin: "-top-5", height: "h-70 md:h-80", width: "w-70 md:w-80", },
+        { img: bathtub, name: "Le frigo", correctName: "La baignore", margin: "-top-5", height: "h-70 md:h-80", width: "w-70 md:w-80" },
         { img: ac, name: "La pomme", correctName: "Le climatiseur", margin: "pt-15", height: "h-80", width: "w-80" },
         { img: laptop, name: "L'ordinateur portable", margin: "-top-3", correctName: "L'ordinateur portable", height: "h-65 md:h-80", width: "w-65 md:w-80" },
         { img: sofa, name: "La chaise", correctName: "Le canapé", margin: "-top-5", height: "h-70 md:h-80", width: "w-70 md:w-80" },
         { img: lamp, name: "La lampe", correctName: "La lampe", margin: "-top-5", height: "h-70 md:h-80", width: "w-55 md:w-65" },
     ]
 
-    // Save progress to localStorage
+    // ---------- SAVE PROGRESS (cookie) ----------
     useEffect(() => {
         const data = {
             currentIndex,
@@ -44,16 +70,27 @@ const Cards = () => {
             cardsChallenge,
             streakDate,
             Streak,
-            lastActiveDate: new Date().toDateString(),
+            lastActiveDate: new Date().toDateString()
         }
-        localStorage.setItem('progress', JSON.stringify(data))
-    }, [currentIndex, countCorrect, countIncorrect, swipedCount, quizCompleted, cardsChallenge, streakDate, Streak])
 
-    // Update streak if quiz completed
+        setCookie("progress", JSON.stringify(data))
+    }, [
+        currentIndex,
+        countCorrect,
+        countIncorrect,
+        swipedCount,
+        quizCompleted,
+        cardsChallenge,
+        streakDate,
+        Streak
+    ])
+
+    // ---------- streak ----------
     useEffect(() => {
         if (!quizCompleted) return
 
         const today = new Date().toDateString()
+
         if (streakDate !== today) {
             const yesterday = new Date()
             yesterday.setDate(yesterday.getDate() - 1)
@@ -64,15 +101,13 @@ const Cards = () => {
         }
     }, [quizCompleted])
 
-    // Challenge completion
+    // ---------- challenge complete ----------
     useEffect(() => {
-        if (swipedCount === cards.length) {
-            setcardsChallenge(true)
-        }
+        if (swipedCount === cards.length) setcardsChallenge(true)
     }, [swipedCount])
 
     const resetProgress = () => {
-        localStorage.removeItem('progress')
+        removeCookie("progress")
         setCurrentIndex(0)
         setSwipedCount(0)
         setcountCorrect(0)
@@ -81,6 +116,8 @@ const Cards = () => {
         setstreakDate(null)
         setcardsChallenge(false)
     }
+
+
 
     const goNext = () => {
         setFlashColor("")

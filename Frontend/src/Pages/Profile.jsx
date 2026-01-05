@@ -13,6 +13,7 @@ const Profile = () => {
     const [activity, setActivity] = useState({});
 
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const API = import.meta.env.VITE_API_URL; // Environment variable
 
     // WEEKLY ACTIVITY FUNCTIONS
     const getWeeklyActivity = () => {
@@ -68,13 +69,13 @@ const Profile = () => {
         setStreak(newStreak);
     }, []);
 
-    // Fetch User
+    // Fetch User via cookie-based auth
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await fetch("http://localhost:3000/getUserData", {
+                const response = await fetch(`${API}/getUserData`, {
                     method: "GET",
-                    credentials: "include",
+                    credentials: "include", // <-- send cookies
                 });
                 const data = await response.json();
                 if (!response.ok) {
@@ -82,7 +83,8 @@ const Profile = () => {
                     return;
                 }
                 setUser(data.user);
-            } catch (error) {
+            } catch (err) {
+                console.error(err);
                 setError("Server error");
             }
         };
@@ -192,7 +194,9 @@ const Profile = () => {
                             const maxHeightPx = 120;
                             const baseHeight = Math.max((value / maxVal) * maxHeightPx, 5);
                             const finalHeight =
-                                day === today ? baseHeight + (challengeCount / 2) * maxHeightPx : baseHeight;
+                                day === today
+                                    ? baseHeight + (challengeCount / 2) * maxHeightPx
+                                    : baseHeight;
 
                             return (
                                 <div key={day} className="flex flex-col items-center justify-end">

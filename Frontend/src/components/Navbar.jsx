@@ -7,12 +7,16 @@ export default function Logout({ className = "", onCloseMenu }) {
     const [open, setOpen] = useState(false);
 
     async function handleLogout() {
-        await fetch("http://localhost:3000/logout", {
-            method: "GET",
-            credentials: "include"
-        });
+        try {
+            await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
+                method: "GET",
+                credentials: "include"      // <-- sends cookie so backend clears it
+            });
+        } catch (err) {
+            console.error("Logout failed:", err);
+        }
 
-        localStorage.removeItem("token");
+        // ❌ no token in localStorage anymore
         localStorage.removeItem("setupComplete");
 
         if (onCloseMenu) onCloseMenu();

@@ -10,7 +10,9 @@ const EditProfile = () => {
         Date: "",
     });
 
-    const [message, setMessage] = useState(""); // For success/error message
+    const [message, setMessage] = useState("");
+
+    const API = import.meta.env.VITE_API_URL;   // <<--- ENV BASE URL
 
     const isFormEmpty = !form.FName && !form.LName && !form.Level && !form.Date;
 
@@ -23,23 +25,18 @@ const EditProfile = () => {
 
     async function edit() {
         try {
-            const res = await fetch("http://localhost:3000/editProfile", {
+            const res = await fetch(`${API}/editProfile`, {
                 method: "POST",
-                credentials: "include",
+                credentials: "include",                 // cookie-based auth
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form),
             });
 
             const data = await res.json();
-            console.log(data);
 
             if (data.user) {
                 setMessage("Profile updated successfully");
-
-                // Redirect after 1 second
-                setTimeout(() => {
-                    navigate("/profile");
-                }, 1000);
+                setTimeout(() => navigate("/profile"), 1000);
             } else {
                 setMessage(data.message || "Failed to update profile");
             }
@@ -52,7 +49,9 @@ const EditProfile = () => {
     return (
         <div>
             <nav className="h-20 md:h-40 w-full bg-[#43406e] flex items-center justify-center">
-                <p className="text-2xl md:text-5xl font-light text-white">Edit Profile</p>
+                <p className="text-2xl md:text-5xl font-light text-white">
+                    Edit Profile
+                </p>
             </nav>
 
             <div className="flex flex-col md:flex-row mx-auto w-full h-140 md:h-140 md:w-175 rounded-2xl shadow-lg shadow-black/50 bg-white bg-opacity-90 mt-10 justify-center gap-10">
@@ -107,14 +106,13 @@ const EditProfile = () => {
                         />
                     </div>
 
-                    {/* Success / Error Message */}
                     <div className="h-6 text-center mt-2">
                         {message && <p className="text-green-600">{message}</p>}
                     </div>
 
                     <button
                         onClick={edit}
-                        disabled={isFormEmpty} // Disabled if all fields are empty
+                        disabled={isFormEmpty}
                         className={`mx-0 md:mx-auto h-10 w-60 md:w-70 mt-3 md:mt-10 rounded cursor-pointer
                             ${isFormEmpty
                                 ? "bg-gray-400 text-gray-700"

@@ -7,10 +7,14 @@ import Apple from '../images/apple.png'
 const Login = () => {
   const navigate = useNavigate()
   const [form, setForm] = useState({
-    email: "", password: ""
+    email: "",
+    password: ""
   })
+
   const [msg, setMsg] = useState()
   const [err, setErr] = useState()
+
+  const API = import.meta.env.VITE_API_URL   // <-- ENV API
 
   function handleLogin(e) {
     setForm({
@@ -22,39 +26,34 @@ const Login = () => {
   async function submit(e) {
     e.preventDefault()
 
-    const api = await fetch("http://localhost:3000/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(form)
-    })
+    try {
+      const api = await fetch(`${API}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",          // <-- cookie auth
+        body: JSON.stringify(form)
+      })
 
-    if (!api.ok) {
-      setErr("Something went wrong")
+      const data = await api.json()
+
+      if (!api.ok) {
+        setErr(data.message || "Wrong email or password")
+        setMsg("")
+        return
+      }
+
+      // ⛔️ NO localStorage — cookie already stores auth
+      setMsg(data.message || "Login successful")
+      setErr("")
+      setForm({ email: "", password: "" })
+
+      setTimeout(() => navigate("/purpose"), 1000)
+
+    } catch (error) {
+      console.error(error)
+      setErr("Server error — please try again")
       setMsg("")
     }
-
-    const data = await api.json()
-
-    // ✅ Store token (from backend)
-    if (data.token) {
-      localStorage.setItem("token", data.token)
-    } else {
-      setErr("Wrong Email or password.")
-      setMsg("")
-      return
-    }
-
-    setMsg(data.message)
-    setErr("")
-    setForm({
-      email: "",
-      password: ""
-    })
-
-    setTimeout(() => {
-      navigate("/purpose")
-    }, 1000)
   }
 
   return (
@@ -65,7 +64,7 @@ const Login = () => {
             <p className="text-lg md:text-4xl font-bold">
               <span className="bg-linear-to-r from-blue-800 to-red-700 bg-clip-text text-transparent">
                 Frenchify
-              </span>{' '}
+              </span>{" "}
               Account
             </p>
 

@@ -1,9 +1,24 @@
 import { useCallback } from "react";
 
-export const Streak = () => {
+export function useStreakCookie() {
+    const getCookie = (name) => {
+        const match = document.cookie.match(
+            new RegExp("(^| )" + name + "=([^;]+)")
+        );
+        return match ? decodeURIComponent(match[2]) : null;
+    };
+
+    const setCookie = (name, value, days = 365) => {
+        const expires = new Date();
+        expires.setDate(expires.getDate() + days);
+        document.cookie =
+            `${name}=${encodeURIComponent(value)};` +
+            `expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+    };
+
     const readStreak = () => {
         try {
-            return JSON.parse(localStorage.getItem("streak")) || {};
+            return JSON.parse(getCookie("streak") || "{}");
         } catch {
             return {};
         }
@@ -13,8 +28,8 @@ export const Streak = () => {
         const today = new Date().toDateString();
         const saved = readStreak();
 
-        let streak = saved.streak ?? 0;
-        const lastDate = saved.lastDate;
+        let streak = saved?.streak ?? 0;
+        const lastDate = saved?.lastDate;
 
         if (!lastDate) {
             streak = 1;
@@ -30,7 +45,7 @@ export const Streak = () => {
             }
         }
 
-        localStorage.setItem(
+        setCookie(
             "streak",
             JSON.stringify({ streak, lastDate: today })
         );
@@ -43,5 +58,10 @@ export const Streak = () => {
         return saved?.streak ?? 0;
     }, []);
 
-    return { updateDailyStreak, getStreak };
-};
+    const resetStreak = useCallback(() => {
+        setCookie("streak", JSON.stringify({ streak: 0, lastDate: null }));
+        return 0;
+    }, []);
+
+    return { updateDailyStreak, getStreak, resetStreak };
+}

@@ -7,21 +7,27 @@ const AuthRoute = ({ element, authType }) => {
     const [isAuth, setIsAuth] = useState(false);
 
     useEffect(() => {
-        try {
-            // Avoid SSR issues and crashes
-            const token = typeof window !== "undefined"
-                ? localStorage.getItem("token")
-                : null;
+        const checkAuth = async () => {
+            try {
+                const res = await fetch(
+                    `${import.meta.env.VITE_API_URL}/auth/me`,
+                    {
+                        method: "GET",
+                        credentials: "include"   // <-- send cookie
+                    }
+                );
 
-            setIsAuth(!!token);
-        } catch {
-            setIsAuth(false);
-        }
+                setIsAuth(res.ok);
+            } catch {
+                setIsAuth(false);
+            }
 
-        setIsReady(true);
+            setIsReady(true);
+        };
+
+        checkAuth();
     }, []);
 
-    // Prevent flashing wrong screen while checking token
     if (!isReady) return null;
 
     if (authType === "protected") {

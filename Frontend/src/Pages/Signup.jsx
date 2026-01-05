@@ -14,6 +14,8 @@ const Signup = () => {
         confirmPassword: ""
     });
 
+    const API = import.meta.env.VITE_API_URL;
+
     function handleForm(e) {
         setForm({
             ...form,
@@ -39,25 +41,27 @@ const Signup = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:3000/signup", {
+            const response = await fetch(`${API}/signup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include",
+                credentials: "include", // send cookies for auth
                 body: JSON.stringify(form)
             });
 
             const data = await response.json();
 
-            if (data.token) {
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("setupComplete", data.setupComplete || false);
+            if (response.ok && data.setupComplete !== undefined) {
+                setMsg("Signup successful!");
 
                 // Redirect based on setup completion
-                navigate(data.setupComplete ? "/main" : "/purpose");
+                setTimeout(() => {
+                    navigate(data.setupComplete ? "/main" : "/purpose");
+                }, 1000);
             } else {
-                setMsg(data.message || "Signup failed");
+                setErr(data.message || "Signup failed");
             }
         } catch (error) {
+            console.error(error);
             setErr("Server error. Please try again later.");
         }
 
@@ -69,11 +73,6 @@ const Signup = () => {
             password: "",
             confirmPassword: ""
         });
-
-        // Fallback navigation after 1 second
-        setTimeout(() => {
-            navigate("/login");
-        }, 1000);
     }
 
     return (

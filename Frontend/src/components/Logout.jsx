@@ -8,20 +8,19 @@ export default function Logout({ className = "" }) {
     const [loading, setLoading] = useState(false);
 
     async function handleLogout() {
-        if (loading) return; // prevent double logout
+        if (loading) return;
         setLoading(true);
 
         try {
             await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
                 method: "GET",
-                credentials: "include"
+                credentials: "include"        // <-- clear cookie in backend
             });
         } catch (err) {
             console.error("Logout failed:", err);
         }
 
-        // Always clear client auth
-        localStorage.removeItem("token");
+
         localStorage.removeItem("setupComplete");
 
         setOpen(false);
@@ -31,7 +30,6 @@ export default function Logout({ className = "" }) {
 
     return (
         <>
-            {/* Logout trigger button */}
             <button
                 onClick={() => setOpen(true)}
                 className={`font-serif cursor-pointer text-black hover:text-blue-700 ${className}`}
@@ -39,7 +37,6 @@ export default function Logout({ className = "" }) {
                 Logout
             </button>
 
-            {/* Modal (via Portal) */}
             {open &&
                 createPortal(
                     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
