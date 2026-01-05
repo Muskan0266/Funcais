@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import Logout from "../components/Logout";
 import { Streak } from "../components/Streak";
 
-
 const Profile = () => {
     const { updateDailyStreak } = Streak();
     const [streak, setStreak] = useState(0);
@@ -33,10 +32,8 @@ const Profile = () => {
     const addActivity = (amount = 1) => {
         const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         const today = daysOfWeek[new Date().getDay()];
-
         const data = getWeeklyActivity();
         data[today] += amount;
-
         localStorage.setItem("weeklyActivity", JSON.stringify(data));
         setActivity({ ...data });
     };
@@ -52,11 +49,9 @@ const Profile = () => {
                 cardsChallenge: false,
                 storyChallenge: false,
             };
-
         let count = 0;
         if (saved.cardsChallenge) count++;
         if (saved.storyChallenge) count++;
-
         setChallengeCount(count);
     }, []);
 
@@ -81,20 +76,16 @@ const Profile = () => {
                     method: "GET",
                     credentials: "include",
                 });
-
                 const data = await response.json();
-
                 if (!response.ok) {
                     setError(data.message || "Failed to fetch user");
                     return;
                 }
-
                 setUser(data.user);
             } catch (error) {
                 setError("Server error");
             }
         };
-
         fetchUser();
     }, []);
 
@@ -107,13 +98,9 @@ const Profile = () => {
         );
 
     const study = JSON.parse(localStorage.getItem("studyTime")) || { minutes: 0 };
-
-    // Max value for scaling weekly activity bars
     const maxVal = Math.max(...Object.values(activity), 1);
-
-    // Get today's day for challenge bonus
     const jsDay = new Date().getDay(); // Sunday=0
-    const today = days[jsDay === 0 ? 6 : jsDay - 1]; // Convert to our days array index
+    const today = days[jsDay === 0 ? 6 : jsDay - 1]; // Adjusted index
 
     return (
         <>
@@ -165,28 +152,23 @@ const Profile = () => {
                     <p className="text-lg text-[#43406e] pl-8 transition-all duration-1000 ease-out">{streak}</p>
                 </div>
 
-
                 <div className="h-30 md:h-50 w-70 pl-23 pt-0 md:pt-6 rounded-2xl shadow-lg shadow-black/50 bg-white bg-opacity-90 transform transition-transform duration-500 hover:scale-105">
                     <p className="text-xl md:text-3xl pl-6 mt-5 animate-bounce">⏱️</p>
                     <p className="text-gray-500 text-lg mt-1 md:mt-2">Study Time</p>
                     <p className="text-lg text-[#43406e] pl-5 transition-all duration-1000 ease-out">{study.minutes} mins</p>
                 </div>
 
-
                 <div className="h-30 md:h-50 w-70 pl-18 pt-0 md:pt-6 rounded-2xl shadow-lg shadow-black/50 bg-white bg-opacity-90 transform transition-transform duration-500 hover:scale-105">
                     <p className="text-xl md:text-3xl pl-10 mt-5 animate-bounce">⭐️</p>
                     <p className="text-gray-500 text-lg mt-1 md:mt-2">Words Learned</p>
                     <p className="text-lg text-[#43406e] pl-12 transition-all duration-1000 ease-out">{cardsCount}</p>
                 </div>
-
-
-
             </div>
 
             {/* PROGRESS + WEEKLY ACTIVITY */}
             <div className="flex flex-col md:flex-row items-center justify-center gap-10 mt-15">
                 {/* PROGRESS CARD */}
-                <div className="h-50 md:h-70 w-70 md:w-100 rounded-2xl shadow-lg shadow-black/50 bg-white bg-opacity-90 ransform transition-transform duration-500 hover:scale-105">
+                <div className="h-50 md:h-70 w-70 md:w-100 rounded-2xl shadow-lg shadow-black/50 bg-white bg-opacity-90 transform transition-transform duration-500 hover:scale-105">
                     <p className="text-lg pl-10 pt-5">Progress</p>
                     <div className="flex justify-center space-x-10 pt-10 md:pt-20">
                         <div>
@@ -202,19 +184,15 @@ const Profile = () => {
                 </div>
 
                 {/* WEEKLY ACTIVITY CARD */}
-                <div className="rounded-2xl shadow-lg shadow-black/50 bg-white bg-opacity-90 h-72 w-80 md:w-120 p-5 ransform transition-transform duration-500 hover:scale-105">
+                <div className="rounded-2xl shadow-lg shadow-black/50 bg-white bg-opacity-90 h-72 w-80 md:w-120 p-5 transform transition-transform duration-500 hover:scale-105">
                     <p className="text-lg pl-5 pt-1">Weekly Activity</p>
                     <div className="flex pt-10 gap-x-2 md:gap-x-4 justify-center items-end h-44">
                         {days.map((day) => {
                             const value = activity[day] || 0;
                             const maxHeightPx = 120;
                             const baseHeight = Math.max((value / maxVal) * maxHeightPx, 5);
-
-                            // Apply challenge bonus only to today's bar
-                            const today = days[new Date().getDay() - 1] || "Sun"; // Adjusting for index
-                            const finalHeight = day === today
-                                ? baseHeight + (challengeCount / 2) * maxHeightPx
-                                : baseHeight;
+                            const finalHeight =
+                                day === today ? baseHeight + (challengeCount / 2) * maxHeightPx : baseHeight;
 
                             return (
                                 <div key={day} className="flex flex-col items-center justify-end">

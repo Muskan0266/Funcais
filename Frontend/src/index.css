@@ -1,12 +1,5 @@
 @import "tailwindcss";
 
-
-/* .fascinate-inline-regular {
-    font-family: "Arial Hebrew", cursive;
-    font-weight: 400;
-    font-style: normal;
-} */
-
 html,
 body {
     height: 100%;
@@ -17,38 +10,22 @@ body {
 .bg_image {
     background:
         linear-gradient(rgba(0, 0, 0, 0.6) 0%,
-            /* top darker */
             rgba(0, 0, 0, 0.2) 40%,
-            /* center lighter */
             rgba(0, 0, 0, 0.6) 100%),
-        url("/src/images/background.jpg");
+        url("/src/images/bg_image.png");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-    /* background-attachment: fixed; */
-    /* overflow: visible; */
     min-height: 100vh;
-
-
-}
-
-.bg_image {
-    background-image: url("/src/images/bg_image.png");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
 }
 
 .nav:hover {
-    /* font-weight: bolder; */
-    transform: scale(1.20);
+    transform: scale(1.2);
     transition: 0.3s ease;
-
 }
 
 .load1 {
     transform: scale(0);
-
     animation: load1 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
 }
 
@@ -95,16 +72,8 @@ body {
 @media (max-width: 640px) {
     .custom-top-rounded {
         clip-path: ellipse(120% 30% at 50% 100%);
-
-
     }
 }
-
-
-
-
-
-
 
 .slider_swipe {
     background-image: url("/src/images/swipe.jpg");
@@ -118,7 +87,6 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-
 }
 
 .slider_story {
@@ -126,10 +94,7 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-
 }
-
-
 
 @keyframes fade-in {
     from {
@@ -158,22 +123,17 @@ body {
 .patch-bg {
     background-image:
         url("/src/images/patch1.png"),
-
         url("/src/images/patch3.png"),
         url("/src/images/patch4.png"),
         url("/src/images/patch5.png");
-
     background-repeat: repeat;
-    background-size: 250px 250px, 200px 200px, 300px 300px, 180px 180px, 220px 220px;
+    background-size: 250px 250px, 200px 200px, 300px 300px, 180px 180px;
     background-position:
         0 0,
         200px 150px,
         400px 300px,
-        100px 400px,
-        300px 100px;
-
+        100px 400px;
     opacity: 0.15;
-    /* subtle background look */
     position: absolute;
     inset: 0;
     z-index: 0;

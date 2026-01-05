@@ -1,5 +1,4 @@
 import React from 'react'
-import Navbar from '../components/Navbar'
 import { Link } from 'react-router-dom'
 import FrontImage from '../images/frontt.png'
 
@@ -20,7 +19,6 @@ const Landing = () => {
                 {/* HERO SECTION */}
                 <div className="flex flex-col md:flex-row">
 
-                    {/* LEFT CONTENT */}
                     {/* LEFT CONTENT */}
                     <div className="text-center md:text-left px-4 md:px-0">
 
@@ -59,32 +57,31 @@ const Landing = () => {
 
                     </div>
 
-                    {/* RIGHT SECTION (mobile stacks below, desktop stays row) */}
+                    {/* RIGHT SECTION */}
                     <div className="flex mt-20 md:mt-0">
 
                         {/* LEFT BUBBLES */}
                         <div className="w-20">
-                            <div className="load1 relative inline-block bg-blue-700 text-white w-15 h-6 py-1 px-2 text-xs md:text-lg md:w-23 md:h-10 md:px-4 md:py-2 rounded-lg font-medium rotate-8  mt-5 md:mt-10 ml-10 md:ml-20 ">
+                            <div className="load1 relative inline-block bg-blue-700 text-white w-15 h-6 py-1 px-2 text-xs md:text-lg md:w-23 md:h-10 md:px-4 md:py-2 rounded-lg font-medium rotate-8 mt-5 md:mt-10 ml-10 md:ml-20">
                                 Bonjour
-                                <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-blue-700 "></div>
+                                <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-blue-700"></div>
                             </div>
-
 
                             <div className="load1 relative inline-block bg-red-600 text-white w-11 h-6 py-1 px-1 text-xs md:text-lg md:w-20 md:h-10 md:px-4 md:py-2 rounded-lg font-medium -rotate-8 mt-30 md:mt-90 ml-5 md:ml-5">
                                 Merci
                                 <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-red-600"></div>
                             </div>
-                            <span className="load1 material-symbols-outlined text-blue-700 scale-[2] md:scale-[4] mt-10 md:mt-32 ml-30 md:ml-10  -rotate-145 md:-rotate-130">
+
+                            <span className="load1 material-symbols-outlined text-blue-700 scale-[2] md:scale-[4] mt-10 md:mt-32 ml-30 md:ml-10 -rotate-145 md:-rotate-130">
                                 switch_access_shortcut
                             </span>
-                            <div className="block md:hidden w-55 md:w-70 ml-5 md:ml-90 relative -pt-7 md:pt-30 ">
+
+                            <div className="block md:hidden w-55 md:w-70 ml-5 md:ml-90 relative -pt-7 md:pt-30">
                                 <p className="load1 text-xs md:text-lg">
                                     Your practical <br className='block md:hidden' /> guide to ordering at a{' '}
-                                    <span className="font-serif text-red-600">Parisian café</span>{' '}and having your first simple French conversation.
+                                    <span className="font-serif text-red-600">Parisian café</span> and having your first simple French conversation.
                                 </p>
                             </div>
-
-
                         </div>
 
                         {/* CENTER IMAGE */}
@@ -92,7 +89,7 @@ const Landing = () => {
                             <img
                                 className="h-60 md:h-170 object-contain"
                                 src={FrontImage}
-                                alt="Front visual"
+                                alt="French learning visual"
                             />
                         </div>
 
@@ -115,6 +112,7 @@ const Landing = () => {
                                 <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-red-600"></div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>

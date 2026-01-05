@@ -21,7 +21,6 @@ const PhotoWord = () => {
                             to learn French
                         </p>
 
-
                         <p className="hidden md:block text-2xl mt-4">
                             Upload any object image and instantly
                         </p>
@@ -31,8 +30,7 @@ const PhotoWord = () => {
 
                         {/* Responsive heading */}
                         <p className="block md:hidden font-bold text-2xl mt-4">
-                            Upload any object image and instantly
-                            get its French name and usage
+                            Upload any object image and instantly get its French name and usage
                         </p>
                     </div>
 
@@ -42,7 +40,7 @@ const PhotoWord = () => {
                           h-80 w-80 md:h-100 md:w-150
                           flex items-center justify-center">
 
-                            <div className="bg-white h-60 w-60 md:h-80 md:w-130  rounded-2xl p-5 md:p-8">
+                            <div className="bg-white h-60 w-60 md:h-80 md:w-130 rounded-2xl p-5 md:p-8">
 
                                 <div className="relative border-3 border-dashed border-gray-500 rounded-2xl
                               h-50 w-full md:h-60
@@ -77,12 +75,9 @@ const PhotoWord = () => {
                         </div>
                     </div>
                 </div>
-
-
             </div>
-            <div >
-                <Footer />
-            </div>
+
+            <Footer />
         </>
     );
 };

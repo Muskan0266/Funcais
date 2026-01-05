@@ -1,88 +1,61 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Logout from '../components/Logout';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 
-const Navbar = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
+export default function Logout({ className = "", onCloseMenu }) {
+    const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
+
+    async function handleLogout() {
+        await fetch("http://localhost:3000/logout", {
+            method: "GET",
+            credentials: "include"
+        });
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("setupComplete");
+
+        if (onCloseMenu) onCloseMenu();
+        navigate("/");
+    }
 
     return (
         <>
-            <nav className="w-full flex items-center justify-between relative z-20">
-                <ul className="flex items-center gap-x-7">
-                    <li className="pl-5 cursor-pointer text-lg md:text-2xl font-bold">
-                        <span className="bg-linear-to-r from-blue-800 to-red-700 bg-clip-text text-transparent">
-                            Funçais
-                        </span>
-                    </li>
-                </ul>
-
-                <ul className="flex gap-x-3 items-center">
-                    <div
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        className="h-[55px] w-[55px] md:w-[70px] md:h-[70px] rounded-b-[120px] hover:shadow-2xl hover:shadow-black/70 transition duration-300 p-5 bg-[#5a578d] mr-5 flex items-center justify-center cursor-pointer"
-                    >
-                        <div className="flex flex-col justify-between w-8 h-6 group">
-                            <span className="block h-1 w-6 md:w-8 bg-white rounded-xl transition-all duration-300 group-hover:w-7"></span>
-                            <span className="block h-1 w-4 md:w-6 bg-white rounded-xl transition-all duration-300 group-hover:w-5"></span>
-                            <span className="block h-1 w-6 md:w-8 bg-white rounded-xl transition-all duration-300 group-hover:w-7"></span>
-                        </div>
-                    </div>
-                </ul>
-            </nav>
-
-            {menuOpen && (
-                <div
-                    className="fixed inset-0 bg-black/40 backdrop-blur-sm z-10"
-                    onClick={() => setMenuOpen(false)}
-                ></div>
-            )}
-
-            <div
-                className={`fixed top-0 right-0 h-full w-[350px] bg-white shadow-2xl transform transition-transform duration-500 ease-in-out z-20 ${menuOpen ? 'translate-x-0' : 'translate-x-full'
-                    }`}
+            <button
+                onClick={() => setOpen(true)}
+                className={`font-serif cursor-pointer text-black hover:text-blue-700 ${className}`}
             >
-                <div className="p-8">
-                    <span
-                        onClick={() => setMenuOpen(false)}
-                        className="material-symbols-outlined text-gray-400 pb-15 -ml-2 cursor-pointer"
-                    >
-                        close
-                    </span>
+                Logout
+            </button>
 
-                    <ul className="flex flex-col gap-4 text-lg font-semibold text-black">
-                        <li>
-                            <Link to="/profile">
-                                <span className="material-symbols-outlined text-black scale-[3] ml-4">
-                                    account_circle
-                                </span>
-                            </Link>
-                        </li>
+            {open &&
+                createPortal(
+                    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-2xl shadow-xl p-6 w-[90%] max-w-md">
+                            <h2 className="text-xl font-semibold mb-2">Log out?</h2>
+                            <p className="text-gray-600 mb-6">
+                                You’ll need to sign in again to continue.
+                            </p>
 
-                        <Link to="/main">
-                            <li className="mt-5 hover:text-blue-700">Home</li>
-                        </Link>
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={() => setOpen(false)}
+                                    className="px-4 py-2 rounded-xl border bg-gray-200 hover:cursor-pointer"
+                                >
+                                    Cancel
+                                </button>
 
-                        <Link to="/cards">
-                            <li className="hover:text-blue-700">FlashCards</li>
-                        </Link>
-
-                        <Link to="/photoWord">
-                            <li className="hover:text-blue-700">Photo-to-Word</li>
-                        </Link>
-
-                        <Link to="/story">
-                            <li className="hover:text-blue-700">Story Challenge</li>
-                        </Link>
-
-                        {/* Logout component */}
-                        <li className="mt-10 hover:bg-white ">
-                            <Logout onCloseMenu={() => setMenuOpen(false)} />
-                        </li>
-                    </ul>
-                </div>
-            </div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="px-4 py-2 rounded-xl bg-blue-600 text-white hover:cursor-pointer bg-blue-800"
+                                >
+                                    Yes, logout
+                                </button>
+                            </div>
+                        </div>
+                    </div>,
+                    document.body
+                )}
         </>
     );
-};
-
-export default Navbar;
+}

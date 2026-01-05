@@ -4,9 +4,15 @@ const StudyTime = () => {
     const [studyMinutes, setStudyMinutes] = useState(0);
 
     useEffect(() => {
-        // Load saved time
-        const saved = JSON.parse(localStorage.getItem("studyTime")) || { minutes: 0 };
-        setStudyMinutes(saved.minutes);
+        let saved;
+        try {
+            saved = JSON.parse(localStorage.getItem("studyTime")) || { minutes: 0 };
+        } catch {
+            saved = { minutes: 0 };
+        }
+
+        const initialMinutes = typeof saved.minutes === "number" ? saved.minutes : 0;
+        setStudyMinutes(initialMinutes);
 
         // Start timer when component mounts
         const start = Date.now();
@@ -17,7 +23,7 @@ const StudyTime = () => {
             const end = Date.now();
             const diffMinutes = Math.floor((end - start) / 60000);
 
-            const updated = saved.minutes + diffMinutes;
+            const updated = initialMinutes + diffMinutes;
 
             localStorage.setItem("studyTime", JSON.stringify({ minutes: updated }));
             localStorage.removeItem("study_start");

@@ -10,7 +10,7 @@ const EditProfile = () => {
         Date: "",
     });
 
-    const [message, setMessage] = useState(""); // For success message
+    const [message, setMessage] = useState(""); // For success/error message
 
     const isFormEmpty = !form.FName && !form.LName && !form.Level && !form.Date;
 
@@ -58,6 +58,7 @@ const EditProfile = () => {
             <div className="flex flex-col md:flex-row mx-auto w-full h-140 md:h-140 md:w-175 rounded-2xl shadow-lg shadow-black/50 bg-white bg-opacity-90 mt-10 justify-center gap-10">
 
                 <div className="mx-auto md:mx-0 flex flex-col gap-6 w-60 md:w-100">
+
                     <div className="flex flex-col ml-0 md:ml-5 relative -mt-4 md:mt-10">
                         <p>First Name</p>
                         <input
@@ -107,7 +108,6 @@ const EditProfile = () => {
                     </div>
 
                     {/* Success / Error Message */}
-
                     <div className="h-6 text-center mt-2">
                         {message && <p className="text-green-600">{message}</p>}
                     </div>
@@ -116,13 +116,14 @@ const EditProfile = () => {
                         onClick={edit}
                         disabled={isFormEmpty} // Disabled if all fields are empty
                         className={`mx-0 md:mx-auto h-10 w-60 md:w-70 mt-3 md:mt-10 rounded cursor-pointer
-        ${isFormEmpty
+                            ${isFormEmpty
                                 ? "bg-gray-400 text-gray-700"
                                 : "bg-[#43406e] text-white hover:bg-[#353358]"
                             }`}
                     >
                         Save Changes
                     </button>
+
                 </div>
             </div>
         </div>

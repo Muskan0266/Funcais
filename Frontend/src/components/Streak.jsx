@@ -1,9 +1,17 @@
 import { useCallback } from "react";
 
 export const Streak = () => {
+    const readStreak = () => {
+        try {
+            return JSON.parse(localStorage.getItem("streak")) || {};
+        } catch {
+            return {};
+        }
+    };
+
     const updateDailyStreak = useCallback(() => {
         const today = new Date().toDateString();
-        const saved = JSON.parse(localStorage.getItem("streak")) || {};
+        const saved = readStreak();
 
         let streak = saved.streak ?? 0;
         const lastDate = saved.lastDate;
@@ -31,7 +39,7 @@ export const Streak = () => {
     }, []);
 
     const getStreak = useCallback(() => {
-        const saved = JSON.parse(localStorage.getItem("streak"));
+        const saved = readStreak();
         return saved?.streak ?? 0;
     }, []);
 

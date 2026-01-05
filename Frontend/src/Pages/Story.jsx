@@ -36,7 +36,7 @@ const RadioCard = ({ question, options, name, value, onSelect }) => {
 };
 
 const Story = () => {
-    const [storyChallenge, setstoryChallenge] = useState(false);
+    const [storyChallenge, setStoryChallenge] = useState(false);
     const [selectedStory, setSelectedStory] = useState(
         stories.length > 0 ? stories[0] : null
     );
@@ -48,24 +48,24 @@ const Story = () => {
 
     const totalQuestions = selectedStory?.questions?.length || 0;
     const correctCount =
-        selectedStory?.questions?.filter((q) => answers[q.id] === q.answer)
-            .length || 0;
-    const score = totalQuestions
-        ? Math.round((correctCount / totalQuestions) * 100)
-        : 0;
+        selectedStory?.questions?.filter((q) => answers[q.id] === q.answer).length ||
+        0;
+    const score = totalQuestions ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
     const handleAnswerSelect = (questionId, value) =>
         setAnswers((prev) => ({ ...prev, [questionId]: value }));
 
+    // Load story progress
     useEffect(() => {
         if (selectedStory) {
             const saved = JSON.parse(
                 localStorage.getItem(`story-${selectedStory.id}-done`)
             );
-            setstoryChallenge(saved || false);
+            setStoryChallenge(saved || false);
         }
     }, [selectedStory]);
 
+    // Save story progress
     useEffect(() => {
         if (selectedStory) {
             localStorage.setItem(
@@ -79,12 +79,8 @@ const Story = () => {
         let progress = JSON.parse(localStorage.getItem("progress")) || {};
         const nowDone = !storyChallenge;
 
-        setstoryChallenge(nowDone);
-
-        localStorage.setItem(
-            `story-${selectedStory.id}-done`,
-            JSON.stringify(nowDone)
-        );
+        setStoryChallenge(nowDone);
+        localStorage.setItem(`story-${selectedStory.id}-done`, JSON.stringify(nowDone));
 
         progress.storyChallenge = nowDone;
         localStorage.setItem("progress", JSON.stringify(progress));
@@ -118,35 +114,24 @@ const Story = () => {
 
                 {/* STORY CONTENT */}
                 <div className="w-full bg-purple-100 rounded-xl p-5 md:flex-1">
-                    <p className="font-black text-lg md:text-3xl">
-                        {selectedStory.name}
-                    </p>
+                    <p className="font-black text-lg md:text-3xl">{selectedStory.name}</p>
 
                     <AudioPlayer
-                        text={
-                            language === "fr"
-                                ? selectedStory.text_fr
-                                : selectedStory.text_en
-                        }
+                        text={language === "fr" ? selectedStory.text_fr : selectedStory.text_en}
                         language={language === "fr" ? "fr-FR" : "en-US"}
                     />
 
                     <div className="flex gap-3 mt-5">
                         <button
                             onClick={() => setLanguage("fr")}
-                            className={`px-6 py-2  rounded-full font-semibold shadow ${language === "fr"
-                                ? "bg-[#5a578d] text-white"
-                                : "bg-white text-gray-600"
+                            className={`px-6 py-2 rounded-full font-semibold shadow ${language === "fr" ? "bg-[#5a578d] text-white" : "bg-white text-gray-600"
                                 }`}
                         >
                             Français
                         </button>
-
                         <button
                             onClick={() => setLanguage("en")}
-                            className={`px-6 py-2 rounded-full font-semibold shadow ${language === "en"
-                                ? "bg-[#5a578d] text-white"
-                                : "bg-white text-gray-600"
+                            className={`px-6 py-2 rounded-full font-semibold shadow ${language === "en" ? "bg-[#5a578d] text-white" : "bg-white text-gray-600"
                                 }`}
                         >
                             English
@@ -154,9 +139,7 @@ const Story = () => {
                     </div>
 
                     <p className="text-sm md:text-lg font-medium leading-7 text-gray-800 pt-3">
-                        {language === "fr"
-                            ? selectedStory.text_fr
-                            : selectedStory.text_en}
+                        {language === "fr" ? selectedStory.text_fr : selectedStory.text_en}
                     </p>
 
                     <h2 className="text-lg md:text-2xl font-semibold mt-10 mb-1 text-gray-800">
@@ -167,11 +150,7 @@ const Story = () => {
                         Questions de Compréhension
                     </h2>
 
-                    <div className=" block 
-  md:grid md:grid-cols-3 
-  gap-y-2 md:gap-3
-  space-y-4 md:space-y-0   
-">
+                    <div className="block md:grid md:grid-cols-3 gap-y-2 md:gap-3 space-y-4 md:space-y-0">
                         {selectedStory.questions?.map((q) => (
                             <RadioCard
                                 key={q.id}
@@ -186,9 +165,7 @@ const Story = () => {
 
                     <div className="flex justify-center mt-5">
                         <button
-                            className={`px-6 py-3  rounded-full font-bold transition-all duration-300 ${storyChallenge
-                                ? "bg-green-500 text-white"
-                                : "bg-blue-500 text-white"
+                            className={`px-6 py-3 rounded-full font-bold transition-all duration-300 ${storyChallenge ? "bg-green-500 text-white" : "bg-blue-500 text-white"
                                 }`}
                             onClick={handleToggleDone}
                         >
@@ -199,9 +176,7 @@ const Story = () => {
 
                 {/* STORIES CATALOGUE */}
                 <div className="w-full md:w-[400px] md:h-[600px] bg-purple-100 rounded-xl overflow-y-auto">
-                    <p className="text-black text-2xl font-semibold p-5">
-                        Stories Catalogue
-                    </p>
+                    <p className="text-black text-2xl font-semibold p-5">Stories Catalogue</p>
 
                     {stories?.map((story) => (
                         <div
@@ -210,9 +185,7 @@ const Story = () => {
                                 setSelectedStory(story);
                                 setAnswers({});
                             }}
-                            className={`rounded-xl flex justify-between w-[300px] h-[70px] mt-5 ml-5 pl-5 pt-2 cursor-pointer ${story.id === selectedStory.id
-                                ? "bg-purple-300"
-                                : "bg-white"
+                            className={`rounded-xl flex justify-between w-[300px] h-[70px] mt-5 ml-5 pl-5 pt-2 cursor-pointer ${story.id === selectedStory.id ? "bg-purple-300" : "bg-white"
                                 }`}
                         >
                             <div className="font-bold">
@@ -226,7 +199,7 @@ const Story = () => {
                         </div>
                     ))}
                 </div>
-            </div >
+            </div>
         </>
     );
 };

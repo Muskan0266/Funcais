@@ -1,16 +1,34 @@
 // components/IsAuthN.jsx
 import { Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const AuthRoute = ({ element, authType }) => {
-    const isAuth = localStorage.getItem("token");
+    const [isReady, setIsReady] = useState(false);
+    const [isAuth, setIsAuth] = useState(false);
+
+    useEffect(() => {
+        try {
+            // Avoid SSR issues and crashes
+            const token = typeof window !== "undefined"
+                ? localStorage.getItem("token")
+                : null;
+
+            setIsAuth(!!token);
+        } catch {
+            setIsAuth(false);
+        }
+
+        setIsReady(true);
+    }, []);
+
+    // Prevent flashing wrong screen while checking token
+    if (!isReady) return null;
 
     if (authType === "protected") {
-        // For pages like /main, /profile, /challenges
         return isAuth ? element : <Navigate to="/login" replace />;
     }
 
     if (authType === "public") {
-        // For pages like /login, /signup, /landing
         return isAuth ? <Navigate to="/main" replace /> : element;
     }
 

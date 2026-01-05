@@ -66,8 +66,7 @@ const Purpose = () => {
                     return (
                         <div
                             key={card.id}
-                            onClick={() => { handleClick(index); selectLevel(card.level) }
-                            }
+                            onClick={() => { handleClick(index); selectLevel(card.level) }}
                             className={`mt-5 relative block md:flex items-start h-15 w-70 md:h-35 md:w-130 rounded-2xl cursor-pointer 
                 ${isSelected ? 'border-2 border-black' : 'border-2 border-transparent'} 
                 hover:border-2 hover:border-black`}
@@ -81,7 +80,7 @@ const Purpose = () => {
                                 </div>
                                 <div>
                                     <p
-                                        className={`${card.text} ${card.margin} font-serif relative -top-9  md:-top-15`}
+                                        className={`${card.text} ${card.margin} font-serif relative -top-9 md:-top-15`}
                                     >
                                         {card.level}
                                     </p>
@@ -93,24 +92,27 @@ const Purpose = () => {
                                     check
                                 </span>
                             )}
-                            <p className="text-red-600 text-sm text-center pt-5 ">{err}</p>
+                            <p className="text-red-600 text-sm text-center pt-5">{err}</p>
                         </div>
-
                     )
                 })}
             </div>
 
             {/* FOOTER + CONTINUE BUTTON */}
-            <footer className='mt-45 md:mt-14'> <Link to="/main">
-                <hr class="border-t-2 border-gray-400 w-full" />
+            <footer className='mt-45 md:mt-14'>
+                <Link to="/main">
+                    <hr className="border-t-2 border-gray-400 w-full" />
 
-                <button className={`h-9 w-40 md:h-12 md:w-80 rounded font-bold px-3 mt-5 md:mt-10 ml-50 md:ml-250 text-white text-xs md:text-sm 
+                    <button
+                        className={`h-9 w-40 md:h-12 md:w-80 rounded font-bold px-3 mt-5 md:mt-10 ml-50 md:ml-250 text-white text-xs md:text-sm 
                            ${selectedIndex !== null ? "bg-blue-700 cursor-pointer" : "bg-gray-400"}`}
-                    disabled={selectedIndex === null}>
-                    Continue
-                </button>
-            </Link></footer>
-        </div >
+                        disabled={selectedIndex === null}
+                    >
+                        Continue
+                    </button>
+                </Link>
+            </footer>
+        </div>
     )
 }
 

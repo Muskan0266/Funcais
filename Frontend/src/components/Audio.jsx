@@ -12,28 +12,52 @@ export default function AudioPlayer({ text, language = "fr-FR" }) {
     const wordsRef = useRef([]);
     const wordIndexRef = useRef(0);
 
+    // --- Safe stop utility ---
+    const stopSpeech = () => {
+        if (typeof window === "undefined") return;
+        window.speechSynthesis?.cancel();
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+        setIsPlaying(false);
+    };
+
+    // --- Recalculate when text changes ---
     useEffect(() => {
-        wordsRef.current = text.trim().split(/\s+/);
+        wordsRef.current = text?.trim()?.length ? text.trim().split(/\s+/) : [];
         const totalWords = wordsRef.current.length;
-        const estimatedDuration = (totalWords / 200) * 60; // 200 WPM
-        setDuration(estimatedDuration);
+        const estimatedDuration = (totalWords / 200) * 60;
+        setDuration(estimatedDuration || 0);
         setCurrentTime(0);
         wordIndexRef.current = 0;
         stopSpeech();
     }, [text]);
 
-    const stopSpeech = () => {
-        window.speechSynthesis.cancel();
-        clearInterval(timerRef.current);
-        setIsPlaying(false);
-    };
+    // --- Cleanup on unmount ---
+    useEffect(() => {
+        return () => stopSpeech();
+    }, []);
+
+    // --- Ensure voices load (Chrome bug fix) ---
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        window.speechSynthesis?.getVoices();
+        const handler = () => window.speechSynthesis?.getVoices();
+        window.speechSynthesis?.addEventListener?.("voiceschanged", handler);
+        return () =>
+            window.speechSynthesis?.removeEventListener?.("voiceschanged", handler);
+    }, []);
 
     const speak = () => {
+        if (typeof window === "undefined") return;
+
+        // Pause
         if (isPlaying) {
-            // Pause
             stopSpeech();
             return;
         }
+
+        // Prevent overlapping audio
+        stopSpeech();
 
         if (wordIndexRef.current >= wordsRef.current.length) return;
 
@@ -42,7 +66,9 @@ export default function AudioPlayer({ text, language = "fr-FR" }) {
         utterance.lang = language;
 
         const voices = window.speechSynthesis.getVoices();
-        const voice = voices.find((v) => v.lang.startsWith(language.split("-")[0]));
+        const voice = voices.find((v) =>
+            v.lang.startsWith(language.split("-")[0])
+        );
         if (voice) utterance.voice = voice;
 
         utterance.volume = volume;
@@ -53,19 +79,21 @@ export default function AudioPlayer({ text, language = "fr-FR" }) {
             setCurrentTime(duration);
             wordIndexRef.current = wordsRef.current.length;
             clearInterval(timerRef.current);
+            timerRef.current = null;
         };
 
-        // Simulate progress by words
+        // Simulated progress
         const wordsRemaining = wordsRef.current.length - wordIndexRef.current;
-        const interval = 0.2; // 200ms
-        const totalTime = (wordsRemaining / 200) * 60; // remaining duration in seconds
-        const increment = (wordsRemaining / totalTime) * interval;
+        const interval = 0.2;
+        const totalTime = (wordsRemaining / 200) * 60;
 
         timerRef.current = setInterval(() => {
             setCurrentTime((prev) => {
                 const next = prev + interval;
-                const approxWordIndex = Math.floor((next / duration) * wordsRef.current.length);
-                wordIndexRef.current = approxWordIndex;
+                const approxIndex = Math.floor(
+                    (next / duration) * wordsRef.current.length
+                );
+                wordIndexRef.current = approxIndex;
                 if (next >= duration) clearInterval(timerRef.current);
                 return Math.min(next, duration);
             });
@@ -121,6 +149,7 @@ export default function AudioPlayer({ text, language = "fr-FR" }) {
             </div>
 
             <Volume2 size={20} className="text-[#5a578d]" />
+
             <input
                 type="range"
                 min="0"
