@@ -124,6 +124,18 @@ app.post("/login", async (req, res) => {
     }
 });
 
+// SAVE PURPOSE
+app.post("/purpose", requireAuth, async (req, res) => {
+    try {
+        const { purpose } = req.body;
+        await User.findByIdAndUpdate(req.userId, { purpose });
+        res.json({ message: "Purpose saved successfully", purpose });
+    } catch (err) {
+        console.error("Save purpose error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
 // LOGOUT
 app.get("/logout", (req, res) => {
     res.clearCookie("token", cookieOptions);
