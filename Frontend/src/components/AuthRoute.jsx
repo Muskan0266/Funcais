@@ -8,7 +8,7 @@ const AuthRoute = ({ element, authType }) => {
     if (loading) return <div>Loading...</div>; // spinner or blank
 
     if (authType === "protected") {
-        return user ? element : <Navigate to="/login" replace />;
+        return user ? element : <Navigate to="/" replace />;
     }
 
     if (authType === "public") {
@@ -17,7 +17,7 @@ const AuthRoute = ({ element, authType }) => {
         return user.level && user.purpose ? (
             <Navigate to="/main" replace />
         ) : (
-            <Navigate to="/purpose" replace />
+            <Navigate to="/" replace />
         );
     }
 
