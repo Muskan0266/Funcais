@@ -42,7 +42,7 @@ const Login = () => {
         return;
       }
 
-      setMsg(data.message || "Login successful");
+      setMsg("Login successful");
       setForm({ email: "", password: "" });
 
       // redirect based on setupComplete
