@@ -1,25 +1,24 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { UserContext } from "../components/UserContext";
 import Google from "../images/google.png";
 import Facebook from "../images/facebook.png";
 import Apple from "../images/apple.png";
+import { UserContext } from "../components/UserContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { setUser } = useContext(UserContext); // ✅ Must be inside component
-
+  const { setUser } = useContext(UserContext); // ✅ must be inside component
   const [form, setForm] = useState({ email: "", password: "" });
-  const [err, setErr] = useState("");
   const [msg, setMsg] = useState("");
+  const [err, setErr] = useState("");
 
-  const API = import.meta.env.VITE_API_URL; // Your backend API
+  const API = import.meta.env.VITE_API_URL;
 
-  const handleChange = (e) => {
+  const handleLogin = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     setErr("");
     setMsg("");
@@ -40,22 +39,20 @@ const Login = () => {
         return;
       }
 
-      setMsg("Login successful");
+      setMsg(data.message || "Login successful");
       setForm({ email: "", password: "" });
 
-      // 2️⃣ Fetch current user
-      const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
+      // 2️⃣ Fetch authenticated user
+      const meRes = await fetch(`${API}/auth/me`, {
+        credentials: "include",
+      });
       const meData = await meRes.json();
+      setUser(meData.user); // ✅ set user in context
 
-      if (meRes.ok && meData.user) {
-        setUser(meData.user); // Update context
+      // 3️⃣ Redirect based on setupComplete
+      if (meData.setupComplete) navigate("/main");
+      else navigate("/purpose");
 
-        // 3️⃣ Redirect based on setupComplete
-        if (meData.setupComplete) navigate("/main");
-        else navigate("/purpose");
-      } else {
-        setErr("Could not fetch user data");
-      }
     } catch (error) {
       console.error(error);
       setErr("Server error — please try again");
@@ -68,7 +65,7 @@ const Login = () => {
         <div className="text-center">
           <p className="text-lg md:text-4xl font-bold">
             <span className="bg-linear-to-r from-blue-800 to-red-700 bg-clip-text text-transparent">
-              Funçais
+              Frenchify
             </span>{" "}
             Account
           </p>
@@ -77,16 +74,15 @@ const Login = () => {
             <span className="text-blue-600 hover:underline cursor-pointer">Not a user?</span>
           </Link>
 
-          <form onSubmit={handleSubmit}>
+          <form>
             <div className="mt-10">
               <input
                 className="h-12 w-65 md:w-80 border border-gray-300 rounded px-3"
                 type="email"
                 name="email"
                 value={form.email}
-                onChange={handleChange}
+                onChange={handleLogin}
                 placeholder="Email"
-                required
               />
             </div>
 
@@ -96,9 +92,8 @@ const Login = () => {
                 type="password"
                 name="password"
                 value={form.password}
-                onChange={handleChange}
+                onChange={handleLogin}
                 placeholder="Password"
-                required
               />
             </div>
 
@@ -106,7 +101,7 @@ const Login = () => {
             <p className="text-green-600 text-sm text-center pt-5">{msg}</p>
 
             <button
-              type="submit"
+              onClick={submit}
               className="h-12 w-65 md:w-80 rounded font-bold px-3 mt-5 text-white text-sm bg-blue-700 hover:bg-blue-800"
             >
               Continue
