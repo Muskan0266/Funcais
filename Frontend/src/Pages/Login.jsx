@@ -1,3 +1,4 @@
+// src/Pages/Login.jsx
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Google from "../images/google.png";
@@ -7,24 +8,24 @@ import { UserContext } from "../components/UserContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { setUser } = useContext(UserContext); // ✅ must be inside component
+  const { setUser } = useContext(UserContext);
+
   const [form, setForm] = useState({ email: "", password: "" });
-  const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
+  const [msg, setMsg] = useState("");
 
   const API = import.meta.env.VITE_API_URL;
 
-  const handleLogin = (e) => {
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const submit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErr("");
     setMsg("");
 
     try {
-      // 1️⃣ Login
       const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,20 +40,18 @@ const Login = () => {
         return;
       }
 
-      setMsg(data.message || "Login successful");
+      setMsg("Login successful");
       setForm({ email: "", password: "" });
 
-      // 2️⃣ Fetch authenticated user
-      const meRes = await fetch(`${API}/auth/me`, {
-        credentials: "include",
-      });
-      const meData = await meRes.json();
-      setUser(meData.user); // ✅ set user in context
+      // ✅ Fetch user info and set context
+      const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
+      if (meRes.ok) {
+        const meData = await meRes.json();
+        setUser(meData.user); // update UserContext
+      }
 
-      // 3️⃣ Redirect based on setupComplete
-      if (meData.setupComplete) navigate("/main");
-      else navigate("/purpose");
-
+      // ✅ Navigate directly to main page for existing users
+      navigate("/main");
     } catch (error) {
       console.error(error);
       setErr("Server error — please try again");
@@ -71,18 +70,21 @@ const Login = () => {
           </p>
 
           <Link to="/signup">
-            <span className="text-blue-600 hover:underline cursor-pointer">Not a user?</span>
+            <span className="text-blue-600 hover:underline cursor-pointer">
+              Not a user?
+            </span>
           </Link>
 
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="mt-10">
               <input
                 className="h-12 w-65 md:w-80 border border-gray-300 rounded px-3"
                 type="email"
                 name="email"
                 value={form.email}
-                onChange={handleLogin}
+                onChange={handleChange}
                 placeholder="Email"
+                required
               />
             </div>
 
@@ -92,8 +94,9 @@ const Login = () => {
                 type="password"
                 name="password"
                 value={form.password}
-                onChange={handleLogin}
+                onChange={handleChange}
                 placeholder="Password"
+                required
               />
             </div>
 
@@ -101,7 +104,7 @@ const Login = () => {
             <p className="text-green-600 text-sm text-center pt-5">{msg}</p>
 
             <button
-              onClick={submit}
+              type="submit"
               className="h-12 w-65 md:w-80 rounded font-bold px-3 mt-5 text-white text-sm bg-blue-700 hover:bg-blue-800"
             >
               Continue
