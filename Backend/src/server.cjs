@@ -106,8 +106,15 @@ app.post("/login", async (req, res) => {
         if (!match) return res.status(400).json({ message: "Wrong password" });
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "3d" });
-        res.cookie("token", token, cookieOptions);
 
+        res.cookie("token", token, {
+
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            path: "/",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
         res.json({
             message: "Login successful",
             setupComplete: !!user.level && !!user.purpose,
