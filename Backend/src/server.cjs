@@ -157,21 +157,7 @@ app.post("/editProfile", requireAuth, async (req, res) => {
     }
 });
 
-// Upload Profile Picture
-app.post(
-    "/uploadProfilePic",
-    requireAuth,
-    upload.single("file"),
-    async (req, res) => {
-        try {
-            const filePath = req.file.path;
-            await User.findByIdAndUpdate(req.userId, { profilePic: filePath });
-            res.json({ message: "Profile picture uploaded", path: filePath });
-        } catch {
-            res.status(500).json({ message: "Upload failed" });
-        }
-    }
-);
+
 
 // React Fallback
 app.get(/.*/, (req, res) => {
