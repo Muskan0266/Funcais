@@ -24,8 +24,9 @@ export default function Logout({ className = "" }) {
         localStorage.removeItem("setupComplete");
 
         setOpen(false);
-        navigate("/");
         setLoading(false);
+        window.location.href = "/";
+
     }
 
     return (
