@@ -13,25 +13,26 @@ const PORT = process.env.PORT || 3000;
 
 // ----- MONGO CONNECTION -----
 mongoose
-    .connect(process.env.MONGO_URL, { // <- use MONGO_URL, not MONGO_URI
+    .connect(process.env.MONGO_URL, { // must match your .env
         useNewUrlParser: true,
         useUnifiedTopology: true,
     })
     .then(() => console.log("MongoDB Connected"))
-    .catch((err) => console.error("MongoDB connection error:", err));
+    .catch((err) => {
+        console.error("MongoDB connection error:", err);
+        process.exit(1); // stop app if DB fails
+    });
 
 // ----- MIDDLEWARE -----
 app.set("trust proxy", 1); // for HTTPS behind proxies
-
 app.use(express.json());
 app.use(cookieParser());
 
 // ----- CORS (frontend on separate domain) -----
-const corsConfig = {
-    origin: process.env.FRONTEND_URL, // must match frontend domain exactly
-    credentials: true,                 // allow cookies to be sent cross-domain
-};
-app.use(cors(corsConfig)); // ✅ no need for app.options("*") anymore
+app.use(cors({
+    origin: process.env.FRONTEND_URL, // exact frontend URL
+    credentials: true,                 // allow cookies cross-domain
+}));
 
 // ----- COOKIE SETTINGS -----
 const cookieOptions = {
@@ -110,12 +111,7 @@ app.post("/login", async (req, res) => {
 
 // LOGOUT
 app.get("/logout", (req, res) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        path: "/",
-    });
+    res.clearCookie("token", cookieOptions);
     res.json({ message: "Logged out successfully" });
 });
 

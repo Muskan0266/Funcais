@@ -6,7 +6,8 @@ const UserSchema = new mongoose.Schema({
     date: { type: Date, required: true }, // Birthdate
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
-    level: { type: String }
-}, { timestamps: true });  // <-- This automatically adds createdAt & updatedAt
+    level: { type: String, default: null },
+    purpose: { type: String, default: null } // needed for setupComplete
+}, { timestamps: true });
 
 module.exports = mongoose.model("User", UserSchema);

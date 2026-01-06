@@ -45,7 +45,13 @@ const Signup = () => {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include", // send cookies for auth
-                body: JSON.stringify(form)
+                body: JSON.stringify({
+                    FName: form.FName,
+                    LName: form.LName,
+                    date: form.date,
+                    email: form.email,
+                    password: form.password
+                })
             });
 
             const data = await response.json();
@@ -65,6 +71,7 @@ const Signup = () => {
             setErr("Server error. Please try again later.");
         }
 
+        // reset form
         setForm({
             FName: "",
             LName: "",
