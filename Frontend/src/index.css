@@ -8,11 +8,28 @@ body {
 }
 
 .bg_image {
-    background: url("/src/images/bg_image.png");
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.6) 0%,
+            /* top darker */
+            rgba(0, 0, 0, 0.2) 40%,
+            /* center lighter */
+            rgba(0, 0, 0, 0.6) 100%),
+        url("/src/images/background.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    /* background-attachment: fixed; */
+    /* overflow: visible; */
     min-height: 100vh;
+
+
+}
+
+.bg_image {
+    background-image: url("/src/images/bg_image.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 
 .nav:hover {
