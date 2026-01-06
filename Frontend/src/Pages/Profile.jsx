@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Logout from "../components/Logout";
-import { Streak } from "../components/Streak";
+import Streak from "../components/Streak";
 
 const Profile = () => {
     const { updateDailyStreak } = Streak();
