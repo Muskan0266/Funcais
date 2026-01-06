@@ -1,38 +1,36 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import Google from '../images/google.png'
-import Facebook from '../images/facebook.png'
-import Apple from '../images/apple.png'
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../components/UserContext";
+import Google from "../images/google.png";
+import Facebook from "../images/facebook.png";
+import Apple from "../images/apple.png";
 
 const Login = () => {
-  const navigate = useNavigate()
-  const [form, setForm] = useState({
-    email: "",
-    password: ""
-  })
+  const navigate = useNavigate();
+  const { setUser } = useContext(UserContext); // ✅ Must be inside component
 
-  const [msg, setMsg] = useState()
-  const [err, setErr] = useState()
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [err, setErr] = useState("");
+  const [msg, setMsg] = useState("");
 
-  const API = import.meta.env.VITE_API_URL   // <-- ENV API
+  const API = import.meta.env.VITE_API_URL; // Your backend API
 
-  function handleLogin(e) {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    })
-  }
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-  async function submit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErr(""); setMsg("");
+    setErr("");
+    setMsg("");
 
     try {
+      // 1️⃣ Login
       const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(form)
+        body: JSON.stringify(form),
       });
 
       const data = await res.json();
@@ -45,89 +43,98 @@ const Login = () => {
       setMsg("Login successful");
       setForm({ email: "", password: "" });
 
-      // redirect based on setupComplete
-      if (data.setupComplete) navigate("/");
-      else navigate("/purpose");
+      // 2️⃣ Fetch current user
+      const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
+      const meData = await meRes.json();
 
+      if (meRes.ok && meData.user) {
+        setUser(meData.user); // Update context
+
+        // 3️⃣ Redirect based on setupComplete
+        if (meData.setupComplete) navigate("/main");
+        else navigate("/purpose");
+      } else {
+        setErr("Could not fetch user data");
+      }
     } catch (error) {
       console.error(error);
       setErr("Server error — please try again");
     }
-  }
+  };
 
   return (
-    <>
-      <div className="bg-white/80 p-10 mt-10 md:mt-25 rounded-2xl shadow-lg w-[80%] md:w-[60%] mx-auto max-w-[800px]">
-        <div className="flex justify-center">
-          <div className="text-center">
-            <p className="text-lg md:text-4xl font-bold">
-              <span className="bg-linear-to-r from-blue-800 to-red-700 bg-clip-text text-transparent">
-                Frenchify
-              </span>{" "}
-              Account
-            </p>
+    <div className="bg-white/80 p-10 mt-10 md:mt-25 rounded-2xl shadow-lg w-[80%] md:w-[60%] mx-auto max-w-[800px]">
+      <div className="flex justify-center">
+        <div className="text-center">
+          <p className="text-lg md:text-4xl font-bold">
+            <span className="bg-linear-to-r from-blue-800 to-red-700 bg-clip-text text-transparent">
+              Funçais
+            </span>{" "}
+            Account
+          </p>
 
-            <Link to="/signup">
-              <span className="text-blue-600 hover:underline cursor-pointer">Not a user?</span>
-            </Link>
+          <Link to="/signup">
+            <span className="text-blue-600 hover:underline cursor-pointer">Not a user?</span>
+          </Link>
 
-            <form>
-              <div className="mt-10">
-                <input
-                  className="h-12 w-65 md:w-80 border border-gray-300 rounded px-3"
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleLogin}
-                  placeholder="Email"
-                />
-              </div>
-
-              <div className="mt-5">
-                <input
-                  className="h-12 w-65 md:w-80 border border-gray-300 rounded px-3"
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleLogin}
-                  placeholder="Password"
-                />
-              </div>
-
-              <p className="text-red-600 text-sm text-center pt-5">{err}</p>
-              <p className="text-green-600 text-sm text-center pt-5">{msg}</p>
-
-              <button
-                onClick={submit}
-                className="h-12 w-65 md:w-80 rounded font-bold px-3 mt-5 text-white text-sm bg-blue-700 hover:bg-blue-800"
-              >
-                Continue
-              </button>
-            </form>
-
-            <div className="flex justify-center items-center mt-5">
-              <p className="text-gray-500 text-sm">or</p>
+          <form onSubmit={handleSubmit}>
+            <div className="mt-10">
+              <input
+                className="h-12 w-65 md:w-80 border border-gray-300 rounded px-3"
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Email"
+                required
+              />
             </div>
 
-            <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
-              <img className="h-5 w-5" src={Google} alt="Google" />
-              <p>Continue with Google</p>
-            </button>
+            <div className="mt-5">
+              <input
+                className="h-12 w-65 md:w-80 border border-gray-300 rounded px-3"
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Password"
+                required
+              />
+            </div>
 
-            <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
-              <img className="h-5 w-5" src={Apple} alt="Apple" />
-              <p>Continue with Apple</p>
-            </button>
+            <p className="text-red-600 text-sm text-center pt-5">{err}</p>
+            <p className="text-green-600 text-sm text-center pt-5">{msg}</p>
 
-            <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
-              <img className="h-5 w-5" src={Facebook} alt="Facebook" />
-              <p>Continue with Facebook</p>
+            <button
+              type="submit"
+              className="h-12 w-65 md:w-80 rounded font-bold px-3 mt-5 text-white text-sm bg-blue-700 hover:bg-blue-800"
+            >
+              Continue
             </button>
+          </form>
+
+          <div className="flex justify-center items-center mt-5">
+            <p className="text-gray-500 text-sm">or</p>
           </div>
+
+          <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
+            <img className="h-5 w-5" src={Google} alt="Google" />
+            <p>Continue with Google</p>
+          </button>
+
+          <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
+            <img className="h-5 w-5" src={Apple} alt="Apple" />
+            <p>Continue with Apple</p>
+          </button>
+
+          <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
+            <img className="h-5 w-5" src={Facebook} alt="Facebook" />
+            <p>Continue with Facebook</p>
+          </button>
         </div>
       </div>
-    </>
-  )
-}
+    </div>
+  );
+};
 
-export default Login
+export default Login;
