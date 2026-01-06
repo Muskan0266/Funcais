@@ -16,7 +16,7 @@ const AuthRoute = ({ element, authType }) => {
 
     // PUBLIC ROUTES
     if (authType === "public") {
-        if (!user) return <Navigate to="/" /> // not logged in → show login/signup
+        if (!user) return element; // not logged in → show login/signup
         // logged in → redirect to main only if user has purpose & level
         return user.level && user.purpose ? <Navigate to="/main" replace /> : <Navigate to="/purpose" replace />;
     }
