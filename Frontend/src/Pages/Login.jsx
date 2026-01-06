@@ -8,7 +8,7 @@ import { UserContext } from "../components/UserContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { setUser } = useContext(UserContext);
+  const { user, setUser, loading } = useContext(UserContext);
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [err, setErr] = useState("");
@@ -47,16 +47,21 @@ const Login = () => {
       const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
       if (meRes.ok) {
         const meData = await meRes.json();
-        setUser(meData.user); // update UserContext
+        setUser(meData.user);
       }
 
-      // ✅ Navigate directly to main page for existing users
+      // ✅ Navigate only after context is updated
       navigate("/main");
     } catch (error) {
       console.error(error);
       setErr("Server error — please try again");
     }
   };
+
+  if (loading) return <div className="text-center mt-20">Loading...</div>;
+
+  // Redirect logged-in users to main
+  if (user) navigate("/main");
 
   return (
     <div className="bg-white/80 p-10 mt-10 md:mt-25 rounded-2xl shadow-lg w-[80%] md:w-[60%] mx-auto max-w-[800px]">
@@ -136,3 +141,4 @@ const Login = () => {
 };
 
 export default Login;
+``

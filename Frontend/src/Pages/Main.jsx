@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { UserContext } from "../components/UserContext";
 
 const Main = () => {
     const [index, setIndex] = useState(0);
+    const { loading, user } = useContext(UserContext);
+
+    if (loading) return <div className="text-center mt-20">Loading...</div>;
+    if (!user) return null; // redirect handled by AuthRoute
 
     const arr = [
         {
@@ -59,9 +64,7 @@ const Main = () => {
 
     return (
         <>
-
             <div className="relative overflow-hidden h-175 md:h-200">
-                {/* PATCH BACKGROUND */}
                 <div className="absolute inset-0 patch-bg"></div>
                 <div className="bg-white min-h-screen pb-20">
                     <Navbar />
@@ -79,20 +82,18 @@ const Main = () => {
                     </div>
 
                     {/* SLIDER */}
-                    <div className="md:w-full h-300 md:h-[1200px] custom-top-rounded bg-[#43406e] flex flex-col items-center justify-center relative -mt-175 md:-mt-150">
+                    <div className="md:w-full h-300 md:h-[1200px] custom-top-rounded bg-[#43406e] flex flex-col items-center justify-center relative -mt-52 md:-mt-44">
                         <div className="flex items-center justify-center gap-4 relative z-20">
-                            {/* PREVIOUS */}
                             <button
                                 onClick={prev}
-                                className="text-white bg-black/70 h-10 w-7 md:h-15 md:w-12 rounded-full hover:bg-black/90 text-3xl mt-210 md:mt-180"
+                                className="text-white bg-black/70 h-10 w-7 md:h-15 md:w-12 rounded-full hover:bg-black/90 text-3xl mt-52 md:mt-44"
                             >
                                 ‹
                             </button>
 
-                            {/* VIEWPORT */}
                             <div className="overflow-hidden w-[300px] md:w-[550px]">
                                 <div
-                                    className="flex transition-transform duration-500 mt-210 md:mt-170"
+                                    className="flex transition-transform duration-500 mt-52 md:mt-44"
                                     style={{ transform: `translateX(-${index * 100}%)` }}
                                 >
                                     {arr.map((box) => (
@@ -106,10 +107,9 @@ const Main = () => {
                                 </div>
                             </div>
 
-                            {/* NEXT */}
                             <button
                                 onClick={next}
-                                className="text-white bg-black/70 h-10 w-7 md:h-15 md:w-12 rounded-full hover:bg-black/90 text-3xl mt-210 md:mt-180"
+                                className="text-white bg-black/70 h-10 w-7 md:h-15 md:w-12 rounded-full hover:bg-black/90 text-3xl mt-52 md:mt-44"
                             >
                                 ›
                             </button>
