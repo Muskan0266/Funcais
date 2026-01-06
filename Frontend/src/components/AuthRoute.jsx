@@ -5,25 +5,23 @@ import { UserContext } from "./UserContext";
 const AuthRoute = ({ element, authType }) => {
     const { user, loading } = useContext(UserContext);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div className="text-center mt-20">Loading...</div>;
 
-    // 🔒 PROTECTED ROUTES
     if (authType === "protected") {
-        if (!user) return <Navigate to="/" replace />;
+        if (!user) return <Navigate to="/login" replace />;
 
-        // 🚧 if not finished setup → force to purpose/level
         if (!user.purpose) return <Navigate to="/purpose" replace />;
         if (!user.level) return <Navigate to="/level" replace />;
 
         return element;
     }
 
-    // 🌎 PUBLIC ROUTES
     if (authType === "public") {
-        if (!user) return element; // not logged in → show page (landing/login/signup)
+        if (!user) return element;
 
-        // logged in → go straight to main
-        return <Navigate to="/main" replace />;
+        return user.purpose && user.level
+            ? <Navigate to="/main" replace />
+            : <Navigate to="/purpose" replace />;
     }
 
     return element;

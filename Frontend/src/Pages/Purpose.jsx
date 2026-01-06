@@ -1,52 +1,40 @@
-import { useState, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../components/UserContext";
 
 const Purpose = () => {
-    const [selected, setSelected] = useState(null);
+    const { user, setUser } = useContext(UserContext);
+    const [purpose, setPurpose] = useState(user?.purpose || "");
     const navigate = useNavigate();
-    const { setUser } = useContext(UserContext);
 
-    const options = ["Travel", "School", "Work", "Community", "Others"];
-
-    const savePurpose = async () => {
-        if (selected === null) return;
-
-        const res = await fetch(
-            `${import.meta.env.VITE_API_URL}/purpose`,
-            {
+    const handleSubmit = async () => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/purpose`, {
                 method: "POST",
-                credentials: "include",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ purpose: options[selected] }),
+                credentials: "include",
+                body: JSON.stringify({ purpose })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setUser({ ...user, purpose });
+                navigate("/level");
             }
-        );
-
-        const data = await res.json();
-
-        // update context
-        setUser(prev => ({ ...prev, purpose: data.purpose }));
-
-        navigate("/level");
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (
-        <div>
-            <h2>Why are you learning French?</h2>
-
-            {options.map((p, i) => (
-                <button
-                    key={i}
-                    onClick={() => setSelected(i)}
-                    style={{ border: selected === i ? "2px solid black" : "" }}
-                >
-                    {p}
-                </button>
-            ))}
-
-            <button disabled={selected === null} onClick={savePurpose}>
-                Continue
-            </button>
+        <div className="p-10 text-center">
+            <h1 className="text-3xl font-bold">Choose Your Purpose</h1>
+            <input
+                type="text"
+                value={purpose}
+                onChange={(e) => setPurpose(e.target.value)}
+                className="border p-3 mt-4"
+            />
+            <button onClick={handleSubmit} className="bg-blue-700 text-white py-2 px-6 rounded mt-4">Save & Continue</button>
         </div>
     );
 };

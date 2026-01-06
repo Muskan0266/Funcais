@@ -14,59 +14,31 @@ import Profile from "./Pages/Profile";
 import EditProfile from "./Pages/EditProfile";
 
 import AuthRoute from "./components/AuthRoute";
+import { UserProvider } from "./components/UserContext";
+
+const router = createBrowserRouter([
+  // PUBLIC PAGES
+  { path: "/", element: <AuthRoute element={<Landing />} authType="public" /> },
+  { path: "/login", element: <AuthRoute element={<Login />} authType="public" /> },
+  { path: "/signup", element: <AuthRoute element={<Signup />} authType="public" /> },
+
+  // PROTECTED PAGES
+  { path: "/main", element: <AuthRoute element={<Main />} authType="protected" /> },
+  { path: "/profile", element: <AuthRoute element={<Profile />} authType="protected" /> },
+  { path: "/purpose", element: <AuthRoute element={<Purpose />} authType="protected" /> },
+  { path: "/level", element: <AuthRoute element={<Level />} authType="protected" /> },
+  { path: "/cards", element: <AuthRoute element={<Cards />} authType="protected" /> },
+  { path: "/story", element: <AuthRoute element={<Story />} authType="protected" /> },
+  { path: "/photoWord", element: <AuthRoute element={<PhotoWord />} authType="protected" /> },
+  { path: "/edit_pr", element: <AuthRoute element={<EditProfile />} authType="protected" /> },
+]);
 
 function App() {
-  const router = createBrowserRouter([
-    // PUBLIC PAGES
-    {
-      path: "/",
-      element: <AuthRoute element={<Landing />} authType="public" />,
-    },
-    {
-      path: "/login",
-      element: <AuthRoute element={<Login />} authType="public" />,
-    },
-    {
-      path: "/signup",
-      element: <AuthRoute element={<Signup />} authType="public" />,
-    },
-
-    // PROTECTED PAGES
-    {
-      path: "/main",
-      element: <AuthRoute element={<Main />} authType="protected" />,
-    },
-    {
-      path: "/profile",
-      element: <AuthRoute element={<Profile />} authType="protected" />,
-    },
-    {
-      path: "/purpose",
-      element: <AuthRoute element={<Purpose />} authType="protected" />,
-    },
-    {
-      path: "/level",
-      element: <AuthRoute element={<Level />} authType="protected" />,
-    },
-    {
-      path: "/cards",
-      element: <AuthRoute element={<Cards />} authType="protected" />,
-    },
-    {
-      path: "/story",
-      element: <AuthRoute element={<Story />} authType="protected" />,
-    },
-    {
-      path: "/photoWord",
-      element: <AuthRoute element={<PhotoWord />} authType="protected" />,
-    },
-    {
-      path: "/edit_pr",
-      element: <AuthRoute element={<EditProfile />} authType="protected" />,
-    },
-  ]);
-
-  return <RouterProvider router={router} />;
+  return (
+    <UserProvider>
+      <RouterProvider router={router} />
+    </UserProvider>
+  );
 }
 
 export default App;
