@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../components/UserContext";
 
 const EditProfile = () => {
     const navigate = useNavigate();
+    const { user, setUser } = useContext(UserContext);
+
     const [form, setForm] = useState({
         FName: "",
         LName: "",
@@ -12,9 +15,22 @@ const EditProfile = () => {
 
     const [message, setMessage] = useState("");
 
-    const API = import.meta.env.VITE_API_URL;   // <<--- ENV BASE URL
+    const API = import.meta.env.VITE_API_URL;
 
-    const isFormEmpty = !form.FName && !form.LName && !form.Level && !form.Date;
+    // Pre-fill form with current user data
+    useEffect(() => {
+        if (user) {
+            setForm({
+                FName: user.FName || "",
+                LName: user.LName || "",
+                Level: user.level || "",
+                Date: user.date ? user.date.split("T")[0] : "",
+            });
+        }
+    }, [user]);
+
+    const isFormEmpty =
+        !form.FName && !form.LName && !form.Level && !form.Date;
 
     function handleForm(e) {
         setForm({
@@ -25,17 +41,31 @@ const EditProfile = () => {
 
     async function edit() {
         try {
+            // Only send fields that changed
+            const updatedData = {};
+            Object.keys(form).forEach((key) => {
+                if (form[key] !== "" && form[key] !== user[key]) {
+                    updatedData[key] = form[key];
+                }
+            });
+
+            if (Object.keys(updatedData).length === 0) {
+                setMessage("No changes to update.");
+                return;
+            }
+
             const res = await fetch(`${API}/editProfile`, {
                 method: "POST",
-                credentials: "include",                 // cookie-based auth
+                credentials: "include",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
+                body: JSON.stringify(updatedData),
             });
 
             const data = await res.json();
 
             if (data.user) {
                 setMessage("Profile updated successfully");
+                setUser(data.user); // update context so other pages reflect changes
                 setTimeout(() => navigate("/profile"), 1000);
             } else {
                 setMessage(data.message || "Failed to update profile");
@@ -55,9 +85,7 @@ const EditProfile = () => {
             </nav>
 
             <div className="flex flex-col md:flex-row mx-auto w-full h-140 md:h-140 md:w-175 rounded-2xl shadow-lg shadow-black/50 bg-white bg-opacity-90 mt-10 justify-center gap-10">
-
                 <div className="mx-auto md:mx-0 flex flex-col gap-6 w-60 md:w-100">
-
                     <div className="flex flex-col ml-0 md:ml-5 relative -mt-4 md:mt-10">
                         <p>First Name</p>
                         <input
@@ -121,7 +149,6 @@ const EditProfile = () => {
                     >
                         Save Changes
                     </button>
-
                 </div>
             </div>
         </div>
