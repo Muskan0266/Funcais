@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../components/UserContext";
 
 const Signup = () => {
     const navigate = useNavigate();
+    const { setUser } = useContext(UserContext);
     const [err, setErr] = useState("");
     const [msg, setMsg] = useState("");
     const [form, setForm] = useState({
@@ -25,6 +27,7 @@ const Signup = () => {
 
     async function submitForm(e) {
         e.preventDefault();
+        setErr(""); setMsg("");
 
         // Password validation
         if (form.password.length < 8) {
@@ -41,10 +44,11 @@ const Signup = () => {
         }
 
         try {
-            const response = await fetch(`${API}/signup`, {
+            // 1️⃣ Signup request
+            const res = await fetch(`${API}/signup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include", // send cookies for auth
+                credentials: "include",
                 body: JSON.stringify({
                     FName: form.FName,
                     LName: form.LName,
@@ -54,21 +58,38 @@ const Signup = () => {
                 })
             });
 
-            const data = await response.json();
+            const data = await res.json();
 
-            if (response.ok && data.setupComplete !== undefined) {
-                setMsg("Signup successful!");
-
-                // Redirect based on setup completion
-                setTimeout(() => {
-                    navigate(data.setupComplete ? "/main" : "/purpose");
-                }, 1000);
-            } else {
+            if (!res.ok) {
                 setErr(data.message || "Signup failed");
+                return;
             }
+
+            setMsg("Signup successful!");
+
+            // 2️⃣ Auto-login immediately after signup
+            const loginRes = await fetch(`${API}/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ email: form.email, password: form.password })
+            });
+
+            if (!loginRes.ok) {
+                setErr("Signup succeeded but auto-login failed. Please login manually.");
+                return;
+            }
+
+            // 3️⃣ Fetch user info and set context
+            const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
+            const meData = await meRes.json();
+            setUser(meData.user);
+
+            // 4️⃣ Redirect to Purpose page for new users
+            navigate("/purpose");
         } catch (error) {
             console.error(error);
-            setErr("Server error. Please try again later.");
+            setErr("Server error — please try again later.");
         }
 
         // reset form
