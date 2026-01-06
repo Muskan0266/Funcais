@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 // ----- MONGO CONNECTION -----
 mongoose
-    .connect(process.env.MONGO_URI, {
+    .connect(process.env.MONGO_URL, { // <- use MONGO_URL, not MONGO_URI
         useNewUrlParser: true,
         useUnifiedTopology: true,
     })
@@ -28,11 +28,10 @@ app.use(cookieParser());
 
 // ----- CORS (frontend on separate domain) -----
 const corsConfig = {
-    origin: process.env.FRONTEND_URL, // must match frontend exactly
-    credentials: true, // allow cookies
+    origin: process.env.FRONTEND_URL, // must match frontend domain exactly
+    credentials: true,                 // allow cookies to be sent cross-domain
 };
-app.use(cors(corsConfig));
-
+app.use(cors(corsConfig)); // ✅ no need for app.options("*") anymore
 
 // ----- COOKIE SETTINGS -----
 const cookieOptions = {
@@ -52,7 +51,8 @@ const requireAuth = (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.userId = decoded.id;
         next();
-    } catch {
+    } catch (err) {
+        console.error("Auth error:", err);
         res.status(401).json({ message: "Invalid or expired token" });
     }
 };
@@ -63,15 +63,23 @@ const requireAuth = (req, res, next) => {
 app.post("/signup", async (req, res) => {
     try {
         const { FName, LName, date, email, password } = req.body;
+
+        if (!FName || !LName || !email || !password) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+
         const existing = await User.findOne({ email });
         if (existing) return res.status(400).json({ message: "Email already registered" });
 
         const hashedPass = await bcrypt.hash(password, 10);
         await new User({ FName, LName, date, email, password: hashedPass }).save();
 
-        res.status(201).json({ message: "Account created successfully" });
+        res.status(201).json({
+            message: "Account created successfully",
+            setupComplete: false // frontend redirect logic
+        });
     } catch (err) {
-        console.error(err);
+        console.error("Signup error:", err);
         res.status(500).json({ message: "Server error" });
     }
 });
@@ -81,6 +89,7 @@ app.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
+
         if (!user) return res.status(400).json({ message: "User not found" });
 
         const match = await bcrypt.compare(password, user.password);
@@ -89,9 +98,12 @@ app.post("/login", async (req, res) => {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "3d" });
         res.cookie("token", token, cookieOptions);
 
-        res.json({ message: "Login successful" });
+        res.json({
+            message: "Login successful",
+            setupComplete: !!user.level && !!user.purpose
+        });
     } catch (err) {
-        console.error(err);
+        console.error("Login error:", err);
         res.status(500).json({ message: "Server error" });
     }
 });
@@ -109,26 +121,41 @@ app.get("/logout", (req, res) => {
 
 // SAVE LEVEL
 app.post("/level", requireAuth, async (req, res) => {
-    const { level } = req.body;
-    await User.findByIdAndUpdate(req.userId, { level });
-    res.json({ message: "Level saved successfully", level });
+    try {
+        const { level } = req.body;
+        await User.findByIdAndUpdate(req.userId, { level });
+        res.json({ message: "Level saved successfully", level });
+    } catch (err) {
+        console.error("Save level error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 // GET USER DATA
 app.get("/getUserData", requireAuth, async (req, res) => {
-    const user = await User.findById(req.userId).select("-password");
-    res.json({ user, setupComplete: !!user.level && !!user.purpose });
+    try {
+        const user = await User.findById(req.userId).select("-password");
+        res.json({ user, setupComplete: !!user.level && !!user.purpose });
+    } catch (err) {
+        console.error("Get user data error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 // EDIT PROFILE
 app.post("/editProfile", requireAuth, async (req, res) => {
-    const { FName, LName, Level, Date } = req.body;
-    const user = await User.findByIdAndUpdate(
-        req.userId,
-        { FName, LName, level: Level, date: Date },
-        { new: true }
-    ).select("-password");
-    res.json({ message: "Profile updated", user });
+    try {
+        const { FName, LName, Level, Date } = req.body;
+        const user = await User.findByIdAndUpdate(
+            req.userId,
+            { FName, LName, level: Level, date: Date },
+            { new: true }
+        ).select("-password");
+        res.json({ message: "Profile updated", user });
+    } catch (err) {
+        console.error("Edit profile error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 // ----- START SERVER -----
