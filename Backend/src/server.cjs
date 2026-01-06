@@ -34,7 +34,7 @@ const corsConfig = {
 };
 
 app.use(cors(corsConfig));
-app.options("*", cors(corsConfig));
+app.options("/*", cors(corsConfig));
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Credentials", "true");
@@ -152,11 +152,3 @@ app.post("/editProfile", requireAuth, async (req, res) => {
     res.json({ message: "Profile updated", user });
 });
 
-// react fallback
-app.get(/.*/, (req, res) =>
-    res.sendFile(path.join(distPath, "index.html"))
-);
-
-app.listen(PORT, () =>
-    console.log(`App Running on http://localhost:${PORT}`)
-);
