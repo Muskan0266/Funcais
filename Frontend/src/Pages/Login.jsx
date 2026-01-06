@@ -24,35 +24,39 @@ const Login = () => {
   }
 
   async function submit(e) {
-    e.preventDefault()
+    e.preventDefault();
+    setErr(""); setMsg("");
 
     try {
-      const api = await fetch(`${API}/login`, {
+      const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",          // <-- cookie auth
+        credentials: "include", // important
         body: JSON.stringify(form)
-      })
+      });
 
-      const data = await api.json()
+      const data = await res.json();
 
-      if (!api.ok) {
-        setErr(data.message || "Wrong email or password")
-        setMsg("")
-        return
+      if (!res.ok) {
+        setErr(data.message || "Wrong email or password");
+        return;
       }
 
-      // ⛔️ NO localStorage — cookie already stores auth
-      setMsg(data.message || "Login successful")
-      setErr("")
-      setForm({ email: "", password: "" })
+      setMsg(data.message || "Login successful");
+      setForm({ email: "", password: "" });
 
-      setTimeout(() => navigate("/purpose"), 1000)
+      // optional: fetch /auth/me to populate user state
+      const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
+      const meData = await meRes.json();
+      setUser(meData.user); // update your global user state if you have one
+
+      // redirect based on setupComplete
+      if (data.setupComplete) navigate("/dashboard");
+      else navigate("/purpose");
 
     } catch (error) {
-      console.error(error)
-      setErr("Server error — please try again")
-      setMsg("")
+      console.error(error);
+      setErr("Server error — please try again");
     }
   }
 
@@ -69,7 +73,7 @@ const Login = () => {
             </p>
 
             <Link to="/signup">
-              <span className="text-blue-600">Not a user?</span>
+              <span className="text-blue-600 hover:underline cursor-pointer">Not a user?</span>
             </Link>
 
             <form>
