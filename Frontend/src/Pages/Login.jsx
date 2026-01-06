@@ -31,7 +31,7 @@ const Login = () => {
       const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // important
+        credentials: "include",
         body: JSON.stringify(form)
       });
 
@@ -45,13 +45,8 @@ const Login = () => {
       setMsg(data.message || "Login successful");
       setForm({ email: "", password: "" });
 
-      // optional: fetch /auth/me to populate user state
-      const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
-      const meData = await meRes.json();
-      setUser(meData.user); // update your global user state if you have one
-
       // redirect based on setupComplete
-      if (data.setupComplete) navigate("/dashboard");
+      if (data.setupComplete) navigate("/");
       else navigate("/purpose");
 
     } catch (error) {
