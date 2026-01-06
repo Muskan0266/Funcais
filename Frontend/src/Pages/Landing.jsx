@@ -41,8 +41,7 @@ const Landing = () => {
 
                         {/* Subtitle */}
                         <p className="text-sm md:text-2xl font-serif text-blue-700 mt-2 ml-0 md:ml-5">
-                            A modern and social<br className="block md:hidden" />
-                            approach to learning French
+                            A modern and social <br className="block md:hidden" /> approach to learning French
                         </p>
 
                         {/* Signup BUTTON */}
