@@ -5,7 +5,7 @@ import { UserContext } from "./UserContext";
 const AuthRoute = ({ element, authType }) => {
     const { user, loading } = useContext(UserContext);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div>Loading...</div>; // spinner
 
     // PROTECTED ROUTES
     if (authType === "protected") {
@@ -16,7 +16,7 @@ const AuthRoute = ({ element, authType }) => {
     // PUBLIC ROUTES
     if (authType === "public") {
         if (!user) return element;
-        return <Navigate to="/main" replace />
+        return user.level && user.purpose ? <Navigate to="/main" replace /> : <Navigate to="/purpose" replace />;
     }
 
     return element;
