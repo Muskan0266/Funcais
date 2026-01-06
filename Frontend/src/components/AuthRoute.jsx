@@ -7,26 +7,23 @@ const AuthRoute = ({ element, authType }) => {
 
     if (loading) return <div>Loading...</div>;
 
-    const setupComplete = user?.purpose && user?.level;
-
-    // PROTECTED ROUTES
+    // 🔒 PROTECTED ROUTES
     if (authType === "protected") {
         if (!user) return <Navigate to="/" replace />;
 
-        // logged in BUT setup not done → force to purpose page
-        if (!setupComplete) return <Navigate to="/purpose" replace />;
+        // 🚧 if not finished setup → force to purpose/level
+        if (!user.purpose) return <Navigate to="/purpose" replace />;
+        if (!user.level) return <Navigate to="/level" replace />;
 
         return element;
     }
 
-    // PUBLIC ROUTES
+    // 🌎 PUBLIC ROUTES
     if (authType === "public") {
-        if (!user) return element;
+        if (!user) return element; // not logged in → show page (landing/login/signup)
 
-        // Logged in:
-        return setupComplete
-            ? <Navigate to="/main" replace />
-            : <Navigate to="/purpose" replace />;
+        // logged in → go straight to main
+        return <Navigate to="/main" replace />;
     }
 
     return element;
