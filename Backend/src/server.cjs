@@ -32,7 +32,7 @@ const corsConfig = {
     credentials: true, // allow cookies
 };
 app.use(cors(corsConfig));
-app.options("/:all(*)", cors(corsConfig)); // catch-all for preflight
+\ // catch-all for preflight
 
 // ----- COOKIE SETTINGS -----
 const cookieOptions = {
