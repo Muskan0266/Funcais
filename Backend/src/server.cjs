@@ -69,6 +69,8 @@ app.post("/signup", async (req, res) => {
     try {
         const { FName, LName, date, email, password } = req.body;
 
+        console.log("Signup body:", req.body); // 🔹 log request body
+
         if (!FName || !LName || !email || !password) {
             return res.status(400).json({ message: "Missing required fields" });
         }
@@ -77,14 +79,17 @@ app.post("/signup", async (req, res) => {
         if (existing) return res.status(400).json({ message: "Email already registered" });
 
         const hashedPass = await bcrypt.hash(password, 10);
-        await new User({ FName, LName, date, email, password: hashedPass }).save();
+        const user = new User({ FName, LName, date, email, password: hashedPass });
+        await user.save();
+
+        console.log("User created:", user); // 🔹 log user after save
 
         res.status(201).json({
             message: "Account created successfully",
-            setupComplete: false, // frontend redirect logic
+            setupComplete: false,
         });
     } catch (err) {
-        console.error("Signup error:", err);
+        console.error("Signup error:", err); // 🔹 log full error
         res.status(500).json({ message: "Server error" });
     }
 });
