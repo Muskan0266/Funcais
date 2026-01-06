@@ -11,6 +11,7 @@ export function useStreakCookie() {
     const setCookie = (name, value, days = 365) => {
         const expires = new Date();
         expires.setDate(expires.getDate() + days);
+
         document.cookie =
             `${name}=${encodeURIComponent(value)};` +
             `expires=${expires.toUTCString()};path=/;SameSite=Lax`;
@@ -38,18 +39,11 @@ export function useStreakCookie() {
             yesterday.setDate(yesterday.getDate() - 1);
             const yesterdayStr = yesterday.toDateString();
 
-            if (lastDate === yesterdayStr) {
-                streak += 1;
-            } else if (lastDate !== today) {
-                streak = 1;
-            }
+            if (lastDate === yesterdayStr) streak += 1;
+            else if (lastDate !== today) streak = 1;
         }
 
-        setCookie(
-            "streak",
-            JSON.stringify({ streak, lastDate: today })
-        );
-
+        setCookie("streak", JSON.stringify({ streak, lastDate: today }));
         return streak;
     }, []);
 
@@ -65,3 +59,6 @@ export function useStreakCookie() {
 
     return { updateDailyStreak, getStreak, resetStreak };
 }
+
+// OPTIONAL — if you still want to import like `import Streak from ...`
+export default useStreakCookie;
