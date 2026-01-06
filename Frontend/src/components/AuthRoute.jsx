@@ -3,22 +3,23 @@ import { useContext } from "react";
 import { UserContext } from "./UserContext";
 
 const AuthRoute = ({ element, authType }) => {
-    const { user, loading } = useContext(UserContext);
+    const { user, loading, setupComplete } = useContext(UserContext);
 
-    if (loading) return <div>Loading...</div>; // spinner or blank
+    if (loading) return <p className="text-center mt-10">Loading...</p>;
 
     if (authType === "protected") {
-        return user ? element : <Navigate to="/login" replace />;
+        // if user exists but setup not complete, redirect to /purpose
+        if (!user) return <Navigate to="/" replace />;
+        if (user && !setupComplete) return <Navigate to="/purpose" replace />;
+        return element; // logged in & setup complete
     }
 
     if (authType === "public") {
-        if (!user) return element;
-        // check setupComplete
-        return user.level && user.purpose ? (
-            <Navigate to="/main" replace />
-        ) : (
-            <Navigate to="/purpose" replace />
-        );
+        return user
+            ? setupComplete
+                ? <Navigate to="/main" replace />   // full user, setup done
+                : <Navigate to="/purpose" replace /> // logged in, setup pending
+            : element; // not logged in, show public page
     }
 
     return element;

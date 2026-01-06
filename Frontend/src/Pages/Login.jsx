@@ -7,14 +7,15 @@ import { UserContext } from "../components/UserContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { setUser } = useContext(UserContext); // ✅ must be inside component
+  const { setUser, setSetupComplete } = useContext(UserContext);
+
   const [form, setForm] = useState({ email: "", password: "" });
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
 
-  const API = import.meta.env.VITE_API_URL;
+  const API = import.meta.env.VITE_API_URL; // Your backend URL
 
-  const handleLogin = (e) => {
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -24,11 +25,10 @@ const Login = () => {
     setMsg("");
 
     try {
-      // 1️⃣ Login
       const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        credentials: "include", // important to send cookies
         body: JSON.stringify(form),
       });
 
@@ -39,20 +39,18 @@ const Login = () => {
         return;
       }
 
-      setMsg(data.message || "Login successful");
+      setMsg("Login successful");
       setForm({ email: "", password: "" });
 
-      // 2️⃣ Fetch authenticated user
-      const meRes = await fetch(`${API}/auth/me`, {
-        credentials: "include",
-      });
+      // Fetch current user info from backend
+      const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
       const meData = await meRes.json();
-      setUser(meData.user); // ✅ set user in context
 
-      // 3️⃣ Redirect based on setupComplete
-      if (meData.setupComplete) navigate("/main");
-      else navigate("/purpose");
+      // Update context
+      setUser(meData.user);
+      setSetupComplete(meData.setupComplete);
 
+      // Redirect handled by AuthRoute automatically
     } catch (error) {
       console.error(error);
       setErr("Server error — please try again");
@@ -71,18 +69,21 @@ const Login = () => {
           </p>
 
           <Link to="/signup">
-            <span className="text-blue-600 hover:underline cursor-pointer">Not a user?</span>
+            <span className="text-blue-600 hover:underline cursor-pointer">
+              Not a user?
+            </span>
           </Link>
 
-          <form>
+          <form onSubmit={submit}>
             <div className="mt-10">
               <input
                 className="h-12 w-65 md:w-80 border border-gray-300 rounded px-3"
                 type="email"
                 name="email"
                 value={form.email}
-                onChange={handleLogin}
+                onChange={handleChange}
                 placeholder="Email"
+                required
               />
             </div>
 
@@ -92,16 +93,17 @@ const Login = () => {
                 type="password"
                 name="password"
                 value={form.password}
-                onChange={handleLogin}
+                onChange={handleChange}
                 placeholder="Password"
+                required
               />
             </div>
 
-            <p className="text-red-600 text-sm text-center pt-5">{err}</p>
-            <p className="text-green-600 text-sm text-center pt-5">{msg}</p>
+            {err && <p className="text-red-600 text-sm text-center pt-5">{err}</p>}
+            {msg && <p className="text-green-600 text-sm text-center pt-5">{msg}</p>}
 
             <button
-              onClick={submit}
+              type="submit"
               className="h-12 w-65 md:w-80 rounded font-bold px-3 mt-5 text-white text-sm bg-blue-700 hover:bg-blue-800"
             >
               Continue
@@ -112,20 +114,16 @@ const Login = () => {
             <p className="text-gray-500 text-sm">or</p>
           </div>
 
-          <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
-            <img className="h-5 w-5" src={Google} alt="Google" />
-            <p>Continue with Google</p>
-          </button>
-
-          <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
-            <img className="h-5 w-5" src={Apple} alt="Apple" />
-            <p>Continue with Apple</p>
-          </button>
-
-          <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
-            <img className="h-5 w-5" src={Facebook} alt="Facebook" />
-            <p>Continue with Facebook</p>
-          </button>
+          {/* Social login buttons (just UI placeholders) */}
+          {[{ img: Google, label: "Google" }, { img: Apple, label: "Apple" }, { img: Facebook, label: "Facebook" }].map((s, i) => (
+            <button
+              key={i}
+              className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100"
+            >
+              <img className="h-5 w-5" src={s.img} alt={s.label} />
+              <p>Continue with {s.label}</p>
+            </button>
+          ))}
         </div>
       </div>
     </div>
