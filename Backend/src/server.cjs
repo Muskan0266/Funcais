@@ -13,14 +13,14 @@ const PORT = process.env.PORT || 3000;
 
 // ----- MONGO CONNECTION -----
 mongoose
-    .connect(process.env.MONGO_URL, { // must match your .env
+    .connect(process.env.MONGO_URL, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
     })
     .then(() => console.log("MongoDB Connected"))
     .catch((err) => {
         console.error("MongoDB connection error:", err);
-        process.exit(1); // stop app if DB fails
+        process.exit(1);
     });
 
 // ----- MIDDLEWARE -----
@@ -28,11 +28,15 @@ app.set("trust proxy", 1); // for HTTPS behind proxies
 app.use(express.json());
 app.use(cookieParser());
 
-// ----- CORS (frontend on separate domain) -----
-app.use(cors({
+// ----- CORS CONFIG -----
+const corsOptions = {
     origin: process.env.FRONTEND_URL, // exact frontend URL
-    credentials: true,                 // allow cookies cross-domain
-}));
+    credentials: true, // allow cookies cross-domain
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // handle preflight requests
 
 // ----- COOKIE SETTINGS -----
 const cookieOptions = {
@@ -77,7 +81,7 @@ app.post("/signup", async (req, res) => {
 
         res.status(201).json({
             message: "Account created successfully",
-            setupComplete: false // frontend redirect logic
+            setupComplete: false, // frontend redirect logic
         });
     } catch (err) {
         console.error("Signup error:", err);
@@ -90,7 +94,6 @@ app.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-
         if (!user) return res.status(400).json({ message: "User not found" });
 
         const match = await bcrypt.compare(password, user.password);
@@ -101,7 +104,7 @@ app.post("/login", async (req, res) => {
 
         res.json({
             message: "Login successful",
-            setupComplete: !!user.level && !!user.purpose
+            setupComplete: !!user.level && !!user.purpose,
         });
     } catch (err) {
         console.error("Login error:", err);
@@ -150,6 +153,17 @@ app.post("/editProfile", requireAuth, async (req, res) => {
         res.json({ message: "Profile updated", user });
     } catch (err) {
         console.error("Edit profile error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+// NEW: AUTH ME ROUTE (frontend /auth/me)
+app.get("/auth/me", requireAuth, async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select("-password");
+        res.json({ user, setupComplete: !!user.level && !!user.purpose });
+    } catch (err) {
+        console.error("Auth/me error:", err);
         res.status(500).json({ message: "Server error" });
     }
 });
