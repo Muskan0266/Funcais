@@ -59,6 +59,7 @@ const Main = () => {
 
     return (
         <>
+            <Navbar />
             <div className="relative overflow-hidden h-175 md:h-200">
                 {/* PATCH BACKGROUND */}
                 <div className="absolute inset-0 patch-bg"></div>
