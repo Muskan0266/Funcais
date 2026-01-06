@@ -11,7 +11,8 @@ export const UserProvider = ({ children }) => {
             try {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
                     credentials: "include",
-                });
+                }).catch(() => null);
+
                 if (res.ok) {
                     const data = await res.json();
                     setUser(data.user);
