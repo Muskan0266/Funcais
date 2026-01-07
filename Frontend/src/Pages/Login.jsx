@@ -52,10 +52,15 @@ const Login = () => {
       }
 
       const meData = await meRes.json();
-      setUser(meData.user); // ✅ set user in context
+      setUser(meData.user);
 
-      // Navigate to main / purpose page
-      navigate("/purpose"); // or "/purpose" depending on your app flow
+
+      if (!meData.user.purpose) {
+        navigate("/purpose");
+      }
+      else {
+        navigate("/main");
+      }
 
     } catch (error) {
       console.error(error);
