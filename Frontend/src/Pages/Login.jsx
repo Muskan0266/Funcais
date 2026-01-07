@@ -61,8 +61,9 @@ const Login = () => {
 
   if (loading) return <div className="text-center mt-20">Loading...</div>;
 
-  // Redirect logged-in users to main
-  if (user) navigate("/main");
+  useEffect(() => {
+    if (user) navigate("/main");
+  }, [user, navigate]);
 
   return (
     <div className="bg-white/80 p-10 mt-10 md:mt-25 rounded-2xl shadow-lg w-[80%] md:w-[60%] mx-auto max-w-[800px]">
@@ -142,4 +143,3 @@ const Login = () => {
 };
 
 export default Login;
-``
