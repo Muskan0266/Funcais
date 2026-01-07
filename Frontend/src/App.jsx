@@ -27,7 +27,7 @@ const router = createBrowserRouter([
   { path: "/level", element: <AuthRoute element={<Level />} authType="protected" /> },
   { path: "/main", element: <AuthRoute element={<Main />} authType="protected" /> },
   { path: "/profile", element: <AuthRoute element={<Profile />} authType="protected" /> },
-  { path: "/editProfiler", element: <AuthRoute element={<EditProfile />} authType="protected" /> },
+  { path: "/edit_pr", element: <AuthRoute element={<EditProfile />} authType="protected" /> },
   { path: "/story", element: <AuthRoute element={<Story />} authType="protected" /> },
   { path: "/photoWord", element: <AuthRoute element={<PhotoWord />} authType="protected" /> },
   { path: "/cards", element: <AuthRoute element={<Cards />} authType="protected" /> },
