@@ -3,9 +3,18 @@ import { Link } from "react-router-dom";
 import AudioPlayer from "../components/Audio";
 import stories from "../data/story.json";
 
+// Cookie helper functions
+const getCookie = (name) => {
+    const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+    return match ? decodeURIComponent(match[2]) : null;
+};
+const setCookie = (name, value, days = 365) => {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+};
+
 const RadioCard = ({ question, options, name, value, onSelect }) => {
-    const baseClass =
-        "block rounded-md px-4 py-2 mb-2 border cursor-pointer transition duration-150";
+    const baseClass = "block rounded-md px-4 py-2 mb-2 border cursor-pointer transition duration-150";
 
     return (
         <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200">
@@ -15,10 +24,7 @@ const RadioCard = ({ question, options, name, value, onSelect }) => {
                 <label
                     key={idx}
                     className={
-                        baseClass +
-                        (value === opt
-                            ? " border-[#5a578d] bg-purple-50"
-                            : " border-gray-300 bg-white")
+                        baseClass + (value === opt ? " border-[#5a578d] bg-purple-50" : " border-gray-300 bg-white")
                     }
                 >
                     <input
@@ -37,9 +43,7 @@ const RadioCard = ({ question, options, name, value, onSelect }) => {
 
 const Story = () => {
     const [storyChallenge, setStoryChallenge] = useState(false);
-    const [selectedStory, setSelectedStory] = useState(
-        stories.length > 0 ? stories[0] : null
-    );
+    const [selectedStory, setSelectedStory] = useState(stories.length > 0 ? stories[0] : null);
     const [language, setLanguage] = useState("fr");
     const [answers, setAnswers] = useState({});
 
@@ -48,43 +52,40 @@ const Story = () => {
 
     const totalQuestions = selectedStory?.questions?.length || 0;
     const correctCount =
-        selectedStory?.questions?.filter((q) => answers[q.id] === q.answer).length ||
-        0;
+        selectedStory?.questions?.filter((q) => answers[q.id] === q.answer).length || 0;
     const score = totalQuestions ? Math.round((correctCount / totalQuestions) * 100) : 0;
 
     const handleAnswerSelect = (questionId, value) =>
         setAnswers((prev) => ({ ...prev, [questionId]: value }));
 
-    // Load story progress
+    // Load story progress from cookie
     useEffect(() => {
         if (selectedStory) {
-            const saved = JSON.parse(
-                localStorage.getItem(`story-${selectedStory.id}-done`)
-            );
-            setStoryChallenge(saved || false);
+            const saved = JSON.parse(getCookie(`story-${selectedStory.id}-done`) || "false");
+            setStoryChallenge(saved);
         }
     }, [selectedStory]);
 
-    // Save story progress
+    // Save story progress to cookie
     useEffect(() => {
         if (selectedStory) {
-            localStorage.setItem(
-                `story-${selectedStory.id}-done`,
-                JSON.stringify(storyChallenge)
-            );
+            setCookie(`story-${selectedStory.id}-done`, JSON.stringify(storyChallenge));
         }
     }, [storyChallenge, selectedStory]);
 
     const handleToggleDone = () => {
-        let progress = JSON.parse(localStorage.getItem("progress")) || {};
         const nowDone = !storyChallenge;
-
         setStoryChallenge(nowDone);
-        localStorage.setItem(`story-${selectedStory.id}-done`, JSON.stringify(nowDone));
 
+        // Update global progress cookie
+        let progress = {};
+        try {
+            progress = JSON.parse(getCookie("progress") || "{}");
+        } catch { }
         progress.storyChallenge = nowDone;
-        localStorage.setItem("progress", JSON.stringify(progress));
+        setCookie("progress", JSON.stringify(progress));
 
+        // Reset answers if unmarking
         if (!nowDone) setAnswers({});
     };
 
@@ -97,11 +98,9 @@ const Story = () => {
                         FrAmusant
                     </span>
                 </div>
-
                 <p className="font-bold text-black text-lg md:text-2xl">
                     Écoute et Apprends
                 </p>
-
                 <Link to="/profile">
                     <span className="material-symbols-outlined text-[#5a578d] scale-[1] md:scale-[2] pr-7">
                         account_circle
@@ -124,15 +123,13 @@ const Story = () => {
                     <div className="flex gap-3 mt-5">
                         <button
                             onClick={() => setLanguage("fr")}
-                            className={`px-6 py-2 rounded-full font-semibold shadow ${language === "fr" ? "bg-[#5a578d] text-white" : "bg-white text-gray-600"
-                                }`}
+                            className={`px-6 py-2 rounded-full font-semibold shadow ${language === "fr" ? "bg-[#5a578d] text-white" : "bg-white text-gray-600"}`}
                         >
                             Français
                         </button>
                         <button
                             onClick={() => setLanguage("en")}
-                            className={`px-6 py-2 rounded-full font-semibold shadow ${language === "en" ? "bg-[#5a578d] text-white" : "bg-white text-gray-600"
-                                }`}
+                            className={`px-6 py-2 rounded-full font-semibold shadow ${language === "en" ? "bg-[#5a578d] text-white" : "bg-white text-gray-600"}`}
                         >
                             English
                         </button>
@@ -165,8 +162,7 @@ const Story = () => {
 
                     <div className="flex justify-center mt-5">
                         <button
-                            className={`px-6 py-3 rounded-full font-bold transition-all duration-300 ${storyChallenge ? "bg-green-500 text-white" : "bg-blue-500 text-white"
-                                }`}
+                            className={`px-6 py-3 rounded-full font-bold transition-all duration-300 ${storyChallenge ? "bg-green-500 text-white" : "bg-blue-500 text-white"}`}
                             onClick={handleToggleDone}
                         >
                             {storyChallenge ? "Done" : "Mark as Done"}
@@ -185,8 +181,7 @@ const Story = () => {
                                 setSelectedStory(story);
                                 setAnswers({});
                             }}
-                            className={`rounded-xl flex justify-between w-[300px] h-[70px] mt-5 ml-5 pl-5 pt-2 cursor-pointer ${story.id === selectedStory.id ? "bg-purple-300" : "bg-white"
-                                }`}
+                            className={`rounded-xl flex justify-between w-[300px] h-[70px] mt-5 ml-5 pl-5 pt-2 cursor-pointer ${story.id === selectedStory.id ? "bg-purple-300" : "bg-white"}`}
                         >
                             <div className="font-bold">
                                 <p>{story.name}</p>

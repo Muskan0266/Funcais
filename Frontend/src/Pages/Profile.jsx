@@ -43,15 +43,17 @@ const Profile = () => {
         );
     };
 
-    const addActivity = (amount = 1) => {
-        const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const today = daysOfWeek[new Date().getDay()];
-        const data = getWeeklyActivity();
-        data[today] += amount;
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setActivity(getWeeklyActivity());
+            let progress = {};
+            try { progress = JSON.parse(getCookie("progress") || "{}"); } catch { }
+            setChallengeCount((progress.cardsChallenge ? 1 : 0) + (progress.storyChallenge ? 1 : 0));
+            setCardsCount(progress.swipedCount || 0);
+        }, 1000); // poll every second
 
-        setCookie("weeklyActivity", JSON.stringify(data));
-        setActivity({ ...data });
-    };
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         setActivity(getWeeklyActivity());
