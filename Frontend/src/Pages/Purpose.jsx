@@ -34,7 +34,7 @@ const Purpose = () => {
         setUser({ ...user, purpose: selectedPurpose });
 
         // Navigate to level page
-        navigate("/level");
+        // navigate("/level");
     };
 
     return (

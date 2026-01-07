@@ -9,21 +9,25 @@ const AuthRoute = ({ element, authType }) => {
 
     // PUBLIC ROUTES: Landing, Login, Signup
     if (authType === "public") {
-        return !user ? element : <Navigate to="/main" replace />;
+        if (!user) return element; // not logged in, show page
+
+        // logged-in user → redirect based on setup
+        if (!user.purpose) return <Navigate to="/purpose" replace />;
+        if (!user.level) return <Navigate to="/level" replace />;
+        return <Navigate to="/main" replace />;
     }
 
     // PROTECTED ROUTES: Main, Purpose, Level, etc.
     if (authType === "protected") {
-        if (!user) return <Navigate to="/" replace />;
+        if (!user) return <Navigate to="/login" replace />; // not logged in
 
         // Redirect based on setup
         if (!user.purpose && window.location.pathname !== "/purpose")
             return <Navigate to="/purpose" replace />;
+        if (user.purpose && !user.level && window.location.pathname !== "/level")
+            return <Navigate to="/level" replace />;
 
-        // if (user.purpose && !user.level && window.location.pathname !== "/level")
-        //     return <Navigate to="/level" replace />;
-
-        return element;
+        return element; // user has everything, show protected page
     }
 
     return element;
