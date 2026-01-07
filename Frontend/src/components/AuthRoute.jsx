@@ -1,40 +1,37 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "./UserContext";
 
 const AuthRoute = ({ element, authType }) => {
     const { user, loading } = useContext(UserContext);
+    const location = useLocation();
 
     if (loading) return <div className="text-center mt-20">Loading...</div>;
 
-    // ---------- PROTECTED ROUTES ----------
+    const hasPurpose = Boolean(user?.purpose);
+    const hasLevel = Boolean(user?.level);
+
+    // -------- PROTECTED ROUTES --------
     if (authType === "protected") {
-        // not logged in
-        if (!user) return <Navigate to="/" replace />;
+        if (!user) return <Navigate to="/login" replace />;
 
-        const isSetupComplete = Boolean(user.purpose) && Boolean(user.level);
-
-        // user logged in but NOT finished onboarding
-        if (!isSetupComplete) {
-            if (!user.purpose) return <Navigate to="/purpose" replace />;
-
+        // Only gatekeep on purpose — Level is handled inside Purpose screen
+        if (!hasPurpose && location.pathname !== "/purpose") {
+            return <Navigate to="/purpose" replace />;
         }
 
-        // setup complete -> allow normal access
-        return <Navigate to="/main" replace />
+        return element;
     }
 
-    // ---------- PUBLIC ROUTES ----------
+    // -------- PUBLIC ROUTES --------
     if (authType === "public") {
-        // not logged in → can access
         if (!user) return element;
 
-        // logged in
-        const isSetupComplete = Boolean(user.purpose) && Boolean(user.level);
+        // If they completed setup → go straight to main
+        if (hasPurpose && hasLevel) return <Navigate to="/main" replace />;
 
-        return isSetupComplete
-            ? <Navigate to="/main" replace />
-            : <Navigate to="/purpose" replace />;
+        // Otherwise go to purpose flow
+        return <Navigate to="/purpose" replace />;
     }
 
     return element;
