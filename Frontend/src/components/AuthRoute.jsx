@@ -7,12 +7,23 @@ const AuthRoute = ({ element, authType }) => {
 
     if (loading) return <div className="text-center mt-20">Loading...</div>;
 
+    // PUBLIC ROUTES: Landing, Login, Signup
     if (authType === "public") {
-        return !user ? element : <Navigate to="/main" replace />;
+        return !user ? element : <Navigate to="/purpose" replace />;
     }
 
+    // PROTECTED ROUTES: Main, Purpose, Level, etc.
     if (authType === "protected") {
-        return user ? element : <Navigate to="/" replace />;
+        if (!user) return <Navigate to="/" replace />;
+
+        // Redirect based on setup
+        if (!user.purpose && window.location.pathname !== "/purpose")
+            return <Navigate to="/purpose" replace />;
+
+        if (user.purpose && !user.level && window.location.pathname !== "/level")
+            return <Navigate to="/level" replace />;
+
+        return element;
     }
 
     return element;

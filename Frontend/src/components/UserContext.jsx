@@ -12,7 +12,6 @@ export const UserProvider = ({ children }) => {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
                     credentials: "include",
                 });
-
                 if (!res.ok) {
                     setUser(null);
                 } else {

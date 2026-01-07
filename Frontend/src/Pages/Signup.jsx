@@ -1,24 +1,25 @@
 import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { UserContext } from "../components/UserContext";
 
 const Signup = () => {
-    const navigate = useNavigate();
     const { setUser } = useContext(UserContext);
-    const [err, setErr] = useState("");
-    const [msg, setMsg] = useState("");
     const [form, setForm] = useState({
         FName: "", LName: "", date: "", email: "", password: "", confirmPassword: ""
     });
+    const [err, setErr] = useState("");
+    const [msg, setMsg] = useState("");
 
     const API = import.meta.env.VITE_API_URL;
 
     const handleForm = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
     const submitForm = async (e) => {
         e.preventDefault();
-        setErr(""); setMsg("");
+        setErr("");
+        setMsg("");
 
-        // Password checks (keep your current checks)
+        // Password checks
         if (form.password.length < 8) { setErr("Password too short"); return; }
         if (!/[A-Z]/.test(form.password) || !/[@#$%]/.test(form.password) || !/[0-9]/.test(form.password)) {
             setErr("Password not strong"); return;
@@ -30,51 +31,34 @@ const Signup = () => {
             const res = await fetch(`${API}/signup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include", // ✅ crucial
+                credentials: "include",
                 body: JSON.stringify(form)
             });
-
             const data = await res.json();
             if (!res.ok) { setErr(data.message || "Signup failed"); return; }
-            setMsg("Signup successful!");
 
-            // 2️⃣ Auto-login immediately
+            // 2️⃣ Auto-login
             const loginRes = await fetch(`${API}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify({ email: form.email, password: form.password })
             });
+            if (!loginRes.ok) { setErr("Signup succeeded but login failed."); return; }
 
-            if (!loginRes.ok) { setErr("Signup succeeded but auto-login failed."); return; }
-
-            // 3️⃣ Fetch user info AFTER login
-            const meRes = await fetch(`${API}/auth/me`, {
-                credentials: "include"
-            });
-
-            if (!meRes.ok) {
-                const errText = await meRes.text();
-                console.error("Auth/me failed:", errText);
-                setErr("Failed to fetch user data.");
-                return;
-            }
-
+            // 3️⃣ Fetch user info
+            const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
             const meData = await meRes.json();
-            setUser(meData.user); // ✅ store user in context
+            setUser(meData.user); // ✅ AuthRoute will handle redirection
 
-            // 4️⃣ Redirect to Purpose page
-            navigate("/login");
-
+            setMsg("Signup successful!");
         } catch (error) {
             console.error(error);
             setErr("Server error — please try again later.");
         }
 
-        // Reset form (optional)
         setForm({ FName: "", LName: "", date: "", email: "", password: "", confirmPassword: "" });
     };
-
     return (
         <div className="bg-white/80 p-10 mt-10 md:mt-25 rounded-2xl shadow-lg w-[90%] mx-auto max-w-[1200px]">
 

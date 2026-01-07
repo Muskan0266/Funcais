@@ -1,30 +1,28 @@
 // src/Pages/Login.jsx
-import React, { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import Google from "../images/google.png";
 import Facebook from "../images/facebook.png";
 import Apple from "../images/apple.png";
 import { UserContext } from "../components/UserContext";
 
 const Login = () => {
-  const navigate = useNavigate();
-  const { user, setUser, loading } = useContext(UserContext);
-
+  const { setUser } = useContext(UserContext);
   const [form, setForm] = useState({ email: "", password: "" });
   const [err, setErr] = useState("");
   const [msg, setMsg] = useState("");
 
   const API = import.meta.env.VITE_API_URL;
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErr(""); setMsg("");
+    setErr("");
+    setMsg("");
 
     try {
+      // 1️⃣ Login
       const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -33,7 +31,6 @@ const Login = () => {
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         setErr(data.message || "Wrong email or password");
         return;
@@ -42,39 +39,18 @@ const Login = () => {
       setMsg("Login successful");
       setForm({ email: "", password: "" });
 
-      // Fetch user data after login
+      // 2️⃣ Fetch user after login and set in context
       const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
-      if (!meRes.ok) {
-        const errText = await meRes.text();
-        console.error("Auth/me failed:", errText);
-        setErr("Failed to fetch user data.");
-        return;
-      }
-
+      if (!meRes.ok) throw new Error("Failed to fetch user");
       const meData = await meRes.json();
-      setUser(meData.user);
-
-
-      useEffect(() => {
-        if (user) {
-          if (!user.purpose) navigate("/purpose");
-          else if (!user.level) navigate("/level");
-          else navigate("/main");
-        }
-      }, [user]);
-
-      setUser(meData.user);
-      // Slight delay to ensure state propagation
-      setTimeout(() => {
-        if (!meData.user.purpose) navigate("/purpose");
-        else navigate("/main");
-      }, 50);
+      setUser(meData.user); // ✅ AuthRoute will redirect automatically
 
     } catch (error) {
       console.error(error);
       setErr("Server error — please try again");
     }
   };
+
 
   return (
     <div className="bg-white/80 p-10 mt-10 md:mt-25 rounded-2xl shadow-lg w-[80%] md:w-[60%] mx-auto max-w-[800px]">
