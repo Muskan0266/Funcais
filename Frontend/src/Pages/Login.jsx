@@ -57,6 +57,7 @@ const Login = () => {
       setErr("Server error — please try again");
     }
   };
+  console.log("API =", API);
 
   if (loading) return <div className="text-center mt-20">Loading...</div>;
 
