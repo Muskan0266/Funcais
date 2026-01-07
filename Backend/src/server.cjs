@@ -1,10 +1,10 @@
-// server.cjs
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const path = require("path"); // ✅ needed to serve React
 require("dotenv").config();
 
 const User = require("./database/User.js");
@@ -30,22 +30,18 @@ app.use(express.json());
 app.use(cookieParser());
 
 // ----- CORS CONFIG -----
-app.use(
-    cors({
-        origin: process.env.FRONTEND_URL, // deployed frontend
-        credentials: true, // allow cookies
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-    })
-);
+app.use(cors({
+    origin: process.env.FRONTEND_URL, // your React frontend URL
+    credentials: true,
+}));
 
-// ----- COOKIE OPTIONS -----
+// ----- COOKIE SETTINGS -----
 const cookieOptions = {
     httpOnly: true,
-    secure: true,          // Render is HTTPS
-    sameSite: "none",      // required for cross-site cookies
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     path: "/",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
 };
 
 // ----- AUTH MIDDLEWARE -----
@@ -62,7 +58,6 @@ const requireAuth = (req, res, next) => {
         res.status(401).json({ message: "Invalid or expired token" });
     }
 };
-
 // ----- ROUTES -----
 
 // SIGNUP
@@ -145,6 +140,14 @@ app.post("/level", requireAuth, async (req, res) => {
 app.get("/logout", (req, res) => {
     res.clearCookie("token", cookieOptions);
     res.json({ message: "Logged out successfully" });
+});
+
+// ----- SERVE REACT FRONTEND -----
+app.use(express.static(path.join(__dirname, "client/build")));
+
+app.get("*", (req, res) => {
+    // ✅ send index.html for all unknown routes
+    res.sendFile(path.join(__dirname, "client/build", "index.html"));
 });
 
 // ----- START SERVER -----

@@ -12,8 +12,12 @@ const AuthRoute = ({ element, authType }) => {
     if (authType === "protected") {
         if (!user) return <Navigate to="/login" replace />;
 
-        if (!user.purpose) return <Navigate to="/purpose" replace />;
-        if (!user.level) return <Navigate to="/level" replace />;
+        // Don't redirect if we are already on /purpose
+        if (!user.purpose && window.location.pathname !== "/purpose")
+            return <Navigate to="/purpose" replace />;
+
+        if (!user.level && window.location.pathname !== "/level")
+            return <Navigate to="/level" replace />;
 
         return element;
     }
