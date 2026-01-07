@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../components/UserContext';
 
+
 const Purpose = () => {
     const { user, setUser } = useContext(UserContext); // ✅ get and update user
     const navigate = useNavigate();
@@ -89,7 +90,7 @@ const Purpose = () => {
                 </button>
             </footer> */}
 
-            <footer className='mt-15'> <Link to="/level">
+            <footer className='mt-15'>
                 <hr class="border-t-2 border-gray-400 w-full" />
 
                 <button className={`h-9 w-40 md:h-12 md:w-80  rounded font-bold px-3 mt-5 md:mt-10 ml-50 md:ml-250 text-white text-xs md:text-sm 
@@ -99,7 +100,7 @@ const Purpose = () => {
                 >
                     Continue
                 </button>
-            </Link></footer>
+            </footer>
         </div>
     );
 };
