@@ -147,5 +147,33 @@ app.get("/logout", (req, res) => {
     res.json({ message: "Logged out successfully" });
 });
 
+//Edit Profile data
+app.post("/editProfile", async (req, res) => {
+    try {
+        const token = req.cookies.token;
+        if (!token) return res.status(401).json({ message: "Not authenticated" });
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const { FName, LName, Level, Date } = req.body;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            decoded.id,
+            { FName, LName, level: Level, date: Date },
+            { new: true }
+        ).select("-password");
+
+        res.json({ message: "Profile updated", user: updatedUser });
+    } catch (err) {
+        console.error("EditProfile error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+
+})
+
 // ----- START SERVER -----
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
