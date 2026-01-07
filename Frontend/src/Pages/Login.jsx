@@ -55,7 +55,7 @@ const Login = () => {
       setUser(meData.user); // ✅ set user in context
 
       // Navigate to main / purpose page
-      navigate("/main"); // or "/purpose" depending on your app flow
+      navigate("/purpose"); // or "/purpose" depending on your app flow
 
     } catch (error) {
       console.error(error);
