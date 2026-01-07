@@ -1,11 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../components/UserContext";
 
 const EditProfile = () => {
     const navigate = useNavigate();
-    const { user, setUser } = useContext(UserContext);
-
     const [form, setForm] = useState({
         FName: "",
         LName: "",
@@ -13,24 +10,9 @@ const EditProfile = () => {
         Date: "",
     });
 
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState(""); // For success message
 
-    const API = import.meta.env.VITE_API_URL;
-
-    // Pre-fill form with current user data
-    useEffect(() => {
-        if (user) {
-            setForm({
-                FName: user.FName || "",
-                LName: user.LName || "",
-                Level: user.level || "",
-                Date: user.date ? user.date.split("T")[0] : "",
-            });
-        }
-    }, [user]);
-
-    const isFormEmpty =
-        !form.FName && !form.LName && !form.Level && !form.Date;
+    const isFormEmpty = !form.FName && !form.LName && !form.Level && !form.Date;
 
     function handleForm(e) {
         setForm({
@@ -41,34 +23,23 @@ const EditProfile = () => {
 
     async function edit() {
         try {
-            // Only send fields that changed
-            const updatedData = {};
-            Object.keys(form).forEach((key) => {
-                if (form[key] !== "" && form[key] !== user[key]) {
-                    updatedData[key] = form[key];
-                }
-            });
-
-            if (Object.keys(updatedData).length === 0) {
-                setMessage("No changes to update.");
-                return;
-            }
-
-            const res = await fetch(`${API}/editProfile`, {
+            const res = await fetch("http://localhost:3000/editProfile", {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updatedData),
+                body: JSON.stringify(form),
             });
 
             const data = await res.json();
+            console.log(data);
 
             if (data.user) {
-                // ✅ Update context first
-                setUser(data.user);
+                setMessage("Profile updated successfully");
 
-                // ✅ Navigate immediately to /profile
-                navigate("/profile", { replace: true });
+                // Redirect after 1 second
+                setTimeout(() => {
+                    navigate("/profile");
+                }, 1000);
             } else {
                 setMessage(data.message || "Failed to update profile");
             }
@@ -81,12 +52,11 @@ const EditProfile = () => {
     return (
         <div>
             <nav className="h-20 md:h-40 w-full bg-[#43406e] flex items-center justify-center">
-                <p className="text-2xl md:text-5xl font-light text-white">
-                    Edit Profile
-                </p>
+                <p className="text-2xl md:text-5xl font-light text-white">Edit Profile</p>
             </nav>
 
             <div className="flex flex-col md:flex-row mx-auto w-full h-140 md:h-140 md:w-175 rounded-2xl shadow-lg shadow-black/50 bg-white bg-opacity-90 mt-10 justify-center gap-10">
+
                 <div className="mx-auto md:mx-0 flex flex-col gap-6 w-60 md:w-100">
                     <div className="flex flex-col ml-0 md:ml-5 relative -mt-4 md:mt-10">
                         <p>First Name</p>
@@ -136,15 +106,17 @@ const EditProfile = () => {
                         />
                     </div>
 
+                    {/* Success / Error Message */}
+
                     <div className="h-6 text-center mt-2">
                         {message && <p className="text-green-600">{message}</p>}
                     </div>
 
                     <button
                         onClick={edit}
-                        disabled={isFormEmpty}
+                        disabled={isFormEmpty} // Disabled if all fields are empty
                         className={`mx-0 md:mx-auto h-10 w-60 md:w-70 mt-3 md:mt-10 rounded cursor-pointer
-                            ${isFormEmpty
+        ${isFormEmpty
                                 ? "bg-gray-400 text-gray-700"
                                 : "bg-[#43406e] text-white hover:bg-[#353358]"
                             }`}
