@@ -11,7 +11,7 @@ require("dotenv").config();
 
 const User = require("./database/User.js");
 
-const distPath = path.join(__dirname, "client", "build");
+// const distPath = path.join(__dirname, "client", "build");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,7 +32,7 @@ mongoose
 app.set("trust proxy", 1); // for HTTPS behind proxies
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(distPath))
+// app.use(express.static(distPath))
 
 // ----- CORS CONFIG -----
 app.use(
@@ -175,10 +175,10 @@ app.post("/editProfile", async (req, res) => {
     }
 });
 
-app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
+// app.get(/.*/, (req, res) => {
+//     res.sendFile(path.join(distPath, "index.html"));
 
-})
+// })
 
 // ----- START SERVER -----
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
