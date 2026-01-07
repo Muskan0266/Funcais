@@ -12,12 +12,16 @@ const AuthRoute = ({ element, authType }) => {
     if (authType === "protected") {
         if (!user) return <Navigate to="/login" replace />;
 
-        // Don't redirect if we are already on /purpose
-        if (!user.purpose && window.location.pathname !== "/purpose")
-            return <Navigate to="/purpose" replace />;
+        const isSetupComplete = Boolean(user.purpose) && Boolean(user.level);
 
-        if (!user.level && window.location.pathname !== "/level")
-            return <Navigate to="/level" replace />;
+        // If setup not complete, guide them through flow
+        if (!isSetupComplete) {
+            if (!user.purpose && window.location.pathname !== "/purpose")
+                return <Navigate to="/purpose" replace />;
+
+            if (user.purpose && !user.level && window.location.pathname !== "/level")
+                return <Navigate to="/level" replace />;
+        }
 
         return element;
     }
