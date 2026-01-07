@@ -24,8 +24,8 @@ const router = createBrowserRouter([
 
   // PROTECTED PAGES
   { path: "/purpose", element: <AuthRoute element={<Purpose />} authType="protected" /> },
-  { path: "/level", element: <AuthRoute element={<Level />} authType="protected" /> },
-  { path: "/main", element: <AuthRoute element={<Main />} authType="protected" /> },
+  { path: "/level", element: <AuthRoute element={<Level />} authType="protected" requirePurpose /> },
+  { path: "/main", element: <AuthRoute element={<Main />} authType="protected" requirePurpose /> },
   { path: "/profile", element: <AuthRoute element={<Profile />} authType="protected" /> },
   { path: "/edit_pr", element: <AuthRoute element={<EditProfile />} authType="protected" /> },
   { path: "/story", element: <AuthRoute element={<Story />} authType="protected" /> },
