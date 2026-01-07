@@ -11,27 +11,22 @@ const AuthRoute = ({ element, authType }) => {
     const hasPurpose = Boolean(user?.purpose);
     const hasLevel = Boolean(user?.level);
 
-    // -------- PROTECTED ROUTES --------
-    if (authType === "protected") {
-        if (!user) return <Navigate to="/login" replace />;
-
-        // Only gatekeep on purpose — Level is handled inside Purpose screen
-        if (!hasPurpose && location.pathname !== "/purpose") {
-            return <Navigate to="/purpose" replace />;
-        }
-
-        return element;
+    // -------- PUBLIC ROUTES --------
+    // Landing, Login, Signup, etc.
+    if (authType === "public") {
+        if (!user) return element;           // show landing if logged out
+        if (hasPurpose && hasLevel) return <Navigate to="/main" replace />;
+        return <Navigate to="/purpose" replace />;
     }
 
-    // -------- PUBLIC ROUTES --------
-    if (authType === "public") {
-        if (!user) return element;
+    // -------- PROTECTED ROUTES --------
+    if (authType === "protected") {
+        if (!user) return <Navigate to="/" replace />; // NOT login — your landing page
 
-        // If they completed setup → go straight to main
-        if (hasPurpose && hasLevel) return <Navigate to="/main" replace />;
+        if (!hasPurpose && location.pathname !== "/purpose")
+            return <Navigate to="/purpose" replace />;
 
-        // Otherwise go to purpose flow
-        return <Navigate to="/purpose" replace />;
+        return element;
     }
 
     return element;
