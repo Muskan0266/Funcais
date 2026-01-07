@@ -73,15 +73,18 @@ const Profile = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await fetch(`${API}/getUserData`, {
+                const response = await fetch(`${API}/auth/me`, {
                     method: "GET",
-                    credentials: "include", // <-- send cookies
+                    credentials: "include",
                 });
+
                 const data = await response.json();
+
                 if (!response.ok) {
                     setError(data.message || "Failed to fetch user");
                     return;
                 }
+
                 setUser(data.user);
             } catch (err) {
                 console.error(err);
