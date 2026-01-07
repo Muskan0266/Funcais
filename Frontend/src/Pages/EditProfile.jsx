@@ -42,25 +42,22 @@ const EditProfile = () => {
 
     async function edit() {
         try {
-            // Only send fields that changed
             const updatedData = {};
-            Object.keys(form).forEach((key) => {
-                const mapping = {
-                    FName: "FName",
-                    LName: "LName",
-                    Level: "level",
-                    Date: "date"
-                };
+            const mapping = {
+                FName: "FName",
+                LName: "LName",
+                Level: "level",
+                Date: "date",
+            };
 
-                Object.keys(form).forEach((key) => {
-                    if (form[key] !== "" && form[key] !== user[mapping[key]]) {
-                        updatedData[mapping[key]] = form[key];
-                    }
-                });
+            Object.keys(form).forEach((key) => {
+                if (form[key] !== "" && form[key] !== user?.[mapping[key]]) {
+                    updatedData[mapping[key]] = form[key];
+                }
             });
 
             if (Object.keys(updatedData).length === 0) {
-                setMessage("No changes to update.");
+                setMsg("No changes to update.");
                 return;
             }
 
@@ -75,16 +72,18 @@ const EditProfile = () => {
 
             if (data.user) {
                 setUser(data.user);
-                setMsg("Updated successfully!");
 
+                // 🔹 Show success text
+                setMsg("Profile updated successfully!");
+
+                // 🔹 Redirect AFTER 1 second
                 setTimeout(() => {
                     navigate("/profile");
                 }, 1000);
-                navigate("/profile");
             }
         } catch (err) {
             console.error(err);
-            setMessage("Server error while updating profile");
+            setMsg("Server error while updating profile");
         }
     }
 
