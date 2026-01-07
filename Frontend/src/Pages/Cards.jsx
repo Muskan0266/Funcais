@@ -322,7 +322,7 @@ const Cards = () => {
                                 </button>
                             </div>
 
-                            <button onClick={resetProgress} className="bg-[#43406e] text-[#43406e] h-7 w-15 rounded-lg mt-4 hover:bg-red-600">Reset</button>
+                            <button onClick={resetProgress} className="bg-[#43406e] text-[black] h-7 w-15 rounded-lg mt-4 hover:bg-red-600">Reset</button>
                         </div>
 
                         <p className="text-xs md:text-xl mt-3 md:mt-5 ml-8 md:ml-2">
