@@ -6,9 +6,12 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const path = require("path");
+
 require("dotenv").config();
 
 const User = require("./database/User.js");
+
+const distPath = path.resolve(__dirname, "../../Frontend/dist");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,6 +32,7 @@ mongoose
 app.set("trust proxy", 1); // for HTTPS behind proxies
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static(distPath))
 
 // ----- CORS CONFIG -----
 app.use(
