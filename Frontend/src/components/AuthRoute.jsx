@@ -15,7 +15,7 @@ const AuthRoute = ({ element, authType }) => {
         if (!user.purpose) return <Navigate to="/purpose" replace />;
 
         // user finished purpose but not level → go to level
-        if (!user.level) return <Navigate to="/level" replace />;
+
 
         // user fully set up → go to main page
         return <Navigate to="/main" replace />;
@@ -23,11 +23,11 @@ const AuthRoute = ({ element, authType }) => {
 
     // PROTECTED ROUTES: Main, Purpose, Level, etc.
     if (authType === "protected") {
-        if (!user) return <Navigate to="/login" replace />; // not logged in
+        if (!user) return <Navigate to="/" replace />; // not logged in
 
         // Redirect based on setup
         if (!user.purpose) return <Navigate to="/purpose" replace />;
-        if (!user.level) return <Navigate to="/level" replace />;
+
 
         return element; // user has everything, show protected page
     }
