@@ -1,9 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../components/UserContext';
 
 const Purpose = () => {
-    const { user } = useContext(UserContext); // ✅ get user from context
+    const { user, setUser } = useContext(UserContext); // ✅ get and update user
     const navigate = useNavigate();
     const [selectedIndex, setSelectedIndex] = useState(null);
 
@@ -23,6 +23,18 @@ const Purpose = () => {
     }, [user, navigate]);
 
     if (!user) return <div className="text-center mt-20">Loading...</div>; // temporary loading
+
+    // ✅ handle Continue button click
+    const handleContinue = () => {
+        if (selectedIndex === null) return; // safety check
+
+        // Update user context with selected purpose
+        const selectedPurpose = arr[selectedIndex].label;
+        setUser({ ...user, purpose: selectedPurpose });
+
+        // Navigate to level page
+        navigate("/level");
+    };
 
     return (
         <div className="h-30 md:h-100 justify-center">
@@ -66,16 +78,15 @@ const Purpose = () => {
                 })}
             </div>
 
-            <footer className='mt-15'>
-                <Link to="/level">
-                    <hr className="border-t-2 border-gray-400 w-full" />
-
-                    <button className={`h-9 w-40 md:h-12 md:w-80  rounded font-bold px-3 mt-5 md:mt-10 ml-50 md:ml-250 text-white text-xs md:text-sm 
-                    ${selectedIndex !== null ? "bg-blue-700 cursor-pointer" : "bg-gray-400"}`}
-                        disabled={selectedIndex === null}>
-                        Continue
-                    </button>
-                </Link>
+            <footer className='mt-15 flex justify-center'>
+                <button
+                    className={`h-9 w-40 md:h-12 md:w-80 rounded font-bold px-3 mt-5 md:mt-10 text-white text-xs md:text-sm
+                    ${selectedIndex !== null ? "bg-blue-700 cursor-pointer" : "bg-gray-400 cursor-not-allowed"}`}
+                    disabled={selectedIndex === null}
+                    onClick={handleContinue} // ✅ navigate on click
+                >
+                    Continue
+                </button>
             </footer>
         </div>
     );
