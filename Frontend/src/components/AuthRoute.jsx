@@ -7,22 +7,12 @@ const AuthRoute = ({ element, authType }) => {
 
     if (loading) return <div className="text-center mt-20">Loading...</div>;
 
-    // -------- PUBLIC ROUTES (landing, login, signup, etc.) --------
     if (authType === "public") {
-        // If logged out → show normally
-        if (!user) return element;
-
-        // If logged in → always go to main
-        return <Navigate to="/main" replace />;
+        return !user ? element : <Navigate to="/main" replace />;
     }
 
-    // -------- PROTECTED ROUTES (main, profile, etc.) --------
     if (authType === "protected") {
-        // If not logged in → go to landing
-        if (!user) return <Navigate to="/" replace />;
-
-        // If logged in → allow page
-        return element;
+        return user ? element : <Navigate to="/" replace />;
     }
 
     return element;
