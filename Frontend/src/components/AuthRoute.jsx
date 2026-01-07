@@ -1,31 +1,27 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "./UserContext";
 
 const AuthRoute = ({ element, authType }) => {
     const { user, loading } = useContext(UserContext);
-    const location = useLocation();
 
     if (loading) return <div className="text-center mt-20">Loading...</div>;
 
-    const hasPurpose = Boolean(user?.purpose);
-    const hasLevel = Boolean(user?.level);
-
-    // -------- PUBLIC ROUTES --------
-    // Landing, Login, Signup, etc.
+    // -------- PUBLIC ROUTES (landing, login, signup, etc.) --------
     if (authType === "public") {
-        if (!user) return element;           // show landing if logged out
-        if (hasPurpose && hasLevel) return <Navigate to="/main" replace />;
-        return <Navigate to="/purpose" replace />;
+        // If logged out → show normally
+        if (!user) return element;
+
+        // If logged in → always go to main
+        return <Navigate to="/main" replace />;
     }
 
-    // -------- PROTECTED ROUTES --------
+    // -------- PROTECTED ROUTES (main, profile, etc.) --------
     if (authType === "protected") {
-        if (!user) return <Navigate to="/" replace />; // NOT login — your landing page
+        // If not logged in → go to landing
+        if (!user) return <Navigate to="/" replace />;
 
-        if (!hasPurpose && location.pathname !== "/purpose")
-            return <Navigate to="/purpose" replace />;
-
+        // If logged in → allow page
         return element;
     }
 
