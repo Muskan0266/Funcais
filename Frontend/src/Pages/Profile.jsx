@@ -10,6 +10,13 @@ const getCookie = (name) => {
     return match ? decodeURIComponent(match[2]) : null;
 };
 
+const setCookie = (name, value, days = 365) => {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = `${name}=${encodeURIComponent(
+        value
+    )}; expires=${expires}; path=/`;
+};
+
 const Profile = () => {
     const { updateDailyStreak } = Streak();
     const [streak, setStreak] = useState(0);
@@ -24,7 +31,7 @@ const Profile = () => {
 
     const getWeeklyActivity = () => {
         return (
-            JSON.parse(localStorage.getItem("weeklyActivity")) || {
+            JSON.parse(getCookie("weeklyActivity") || "null") || {
                 Mon: 0,
                 Tue: 0,
                 Wed: 0,
@@ -41,7 +48,8 @@ const Profile = () => {
         const today = daysOfWeek[new Date().getDay()];
         const data = getWeeklyActivity();
         data[today] += amount;
-        localStorage.setItem("weeklyActivity", JSON.stringify(data));
+
+        setCookie("weeklyActivity", JSON.stringify(data));
         setActivity({ ...data });
     };
 
@@ -115,7 +123,8 @@ const Profile = () => {
             <p className="text-center mt-10 text-xl text-gray-600">Loading...</p>
         );
 
-    const study = JSON.parse(localStorage.getItem("studyTime")) || { minutes: 0 };
+    // ---- Study time (cookie) ----
+    const study = JSON.parse(getCookie("studyTime") || '{"minutes":0}');
     const maxVal = Math.max(...Object.values(activity), 1);
     const jsDay = new Date().getDay();
     const today = days[jsDay === 0 ? 6 : jsDay - 1];
