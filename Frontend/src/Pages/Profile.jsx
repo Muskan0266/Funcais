@@ -182,7 +182,7 @@ const Profile = () => {
                         </div>
 
                         <div>
-                            <p className="text-[#43406e] text-3xl">{cardsCount} /5</p>
+                            <p className="text-[#43406e] text-3xl">{cardsCount}/5</p>
                             <p className="text-gray-500 text-sm">Cards Swiped</p>
                         </div>
                     </div>

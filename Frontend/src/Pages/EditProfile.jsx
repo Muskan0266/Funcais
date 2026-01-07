@@ -5,6 +5,7 @@ import { UserContext } from "../components/UserContext";
 const EditProfile = () => {
     const navigate = useNavigate();
     const { user, setUser } = useContext(UserContext);
+    const [msg, setMsg] = useState("")
 
     const [form, setForm] = useState({
         FName: "",
@@ -74,6 +75,11 @@ const EditProfile = () => {
 
             if (data.user) {
                 setUser(data.user);
+                setMsg("Updated successfully!");
+
+                setTimeout(() => {
+                    navigate("/profile");
+                }, 1000);
                 navigate("/profile");
             }
         } catch (err) {
@@ -141,7 +147,7 @@ const EditProfile = () => {
                     </div>
 
                     <div className="h-6 text-center mt-2">
-                        {message && <p className="text-green-600">{message}</p>}
+                        {msg && <p className="text-green-600">{msg}</p>}
                     </div>
 
                     <button
