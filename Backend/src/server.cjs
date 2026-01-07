@@ -11,7 +11,7 @@ require("dotenv").config();
 
 const User = require("./database/User.js");
 
-const distPath = path.resolve(__dirname, "../../Frontend/dist");
+const distPath = path.join(__dirname, "client", "build");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
