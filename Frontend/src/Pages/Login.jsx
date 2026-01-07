@@ -55,12 +55,20 @@ const Login = () => {
       setUser(meData.user);
 
 
-      if (!meData.user.purpose) {
-        navigate("/purpose");
-      }
-      else {
-        navigate("/main");
-      }
+      useEffect(() => {
+        if (user) {
+          if (!user.purpose) navigate("/purpose");
+          else if (!user.level) navigate("/level");
+          else navigate("/main");
+        }
+      }, [user]);
+
+      setUser(meData.user);
+      // Slight delay to ensure state propagation
+      setTimeout(() => {
+        if (!meData.user.purpose) navigate("/purpose");
+        else navigate("/main");
+      }, 50);
 
     } catch (error) {
       console.error(error);
