@@ -4,6 +4,7 @@ import { UserContext } from "./UserContext";
 
 const AuthRoute = ({ element, authType }) => {
     console.log("calling /auth/me ...");
+    console.log("URL =", `${import.meta.env.VITE_API_URL}/auth/me`);
     const { user, loading } = useContext(UserContext);
 
     if (loading) return <div className="text-center mt-20">Loading...</div>;
