@@ -69,7 +69,7 @@ const Login = () => {
         <div className="text-center">
           <p className="text-lg md:text-4xl font-bold">
             <span className="bg-linear-to-r from-blue-800 to-red-700 bg-clip-text text-transparent">
-              Frenchify
+              Funçais
             </span>{" "}
             Account
           </p>

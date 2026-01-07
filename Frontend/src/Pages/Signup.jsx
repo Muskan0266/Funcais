@@ -81,7 +81,7 @@ const Signup = () => {
             <h1 className="font-extrabold text-2xl md:text-5xl text-center">
                 Create your{" "}
                 <span className="bg-linear-to-r from-blue-800 to-red-700 bg-clip-text text-transparent">
-                    Frenchify
+                    Funçais
                 </span>{" "}
                 Account
             </h1>
