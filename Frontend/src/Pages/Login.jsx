@@ -22,8 +22,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErr("");
-    setMsg("");
+    setErr(""); setMsg("");
 
     try {
       const res = await fetch(`${API}/login`, {
@@ -43,27 +42,26 @@ const Login = () => {
       setMsg("Login successful");
       setForm({ email: "", password: "" });
 
-      // ✅ Fetch user info and set context
+      // Fetch user data after login
       const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
-      if (meRes.ok) {
-        const meData = await meRes.json();
-        setUser(meData.user);
+      if (!meRes.ok) {
+        const errText = await meRes.text();
+        console.error("Auth/me failed:", errText);
+        setErr("Failed to fetch user data.");
+        return;
       }
 
-      // ✅ Navigate only after context is updated
-      navigate("/main");
+      const meData = await meRes.json();
+      setUser(meData.user); // ✅ set user in context
+
+      // Navigate to main / purpose page
+      navigate("/main"); // or "/purpose" depending on your app flow
+
     } catch (error) {
       console.error(error);
       setErr("Server error — please try again");
     }
   };
-  console.log("API =", API);
-
-  if (loading) return <div className="text-center mt-20">Loading...</div>;
-
-  useEffect(() => {
-    if (user) navigate("/main");
-  }, [user, navigate]);
 
   return (
     <div className="bg-white/80 p-10 mt-10 md:mt-25 rounded-2xl shadow-lg w-[80%] md:w-[60%] mx-auto max-w-[800px]">

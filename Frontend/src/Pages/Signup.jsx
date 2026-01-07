@@ -14,11 +14,11 @@ const Signup = () => {
     const API = import.meta.env.VITE_API_URL;
 
     const handleForm = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-
     const submitForm = async (e) => {
         e.preventDefault();
         setErr(""); setMsg("");
 
+        // Password checks (keep your current checks)
         if (form.password.length < 8) { setErr("Password too short"); return; }
         if (!/[A-Z]/.test(form.password) || !/[@#$%]/.test(form.password) || !/[0-9]/.test(form.password)) {
             setErr("Password not strong"); return;
@@ -30,7 +30,7 @@ const Signup = () => {
             const res = await fetch(`${API}/signup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include",
+                credentials: "include", // ✅ crucial
                 body: JSON.stringify(form)
             });
 
@@ -38,27 +38,40 @@ const Signup = () => {
             if (!res.ok) { setErr(data.message || "Signup failed"); return; }
             setMsg("Signup successful!");
 
-            // 2️⃣ Auto-login
+            // 2️⃣ Auto-login immediately
             const loginRes = await fetch(`${API}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify({ email: form.email, password: form.password })
             });
+
             if (!loginRes.ok) { setErr("Signup succeeded but auto-login failed."); return; }
 
-            // 3️⃣ Fetch user
-            const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
-            const meData = await meRes.json();
-            setUser(meData.user);
+            // 3️⃣ Fetch user info AFTER login
+            const meRes = await fetch(`${API}/auth/me`, {
+                credentials: "include"
+            });
 
-            // 4️⃣ Redirect
+            if (!meRes.ok) {
+                const errText = await meRes.text();
+                console.error("Auth/me failed:", errText);
+                setErr("Failed to fetch user data.");
+                return;
+            }
+
+            const meData = await meRes.json();
+            setUser(meData.user); // ✅ store user in context
+
+            // 4️⃣ Redirect to Purpose page
             navigate("/purpose");
+
         } catch (error) {
             console.error(error);
             setErr("Server error — please try again later.");
         }
 
+        // Reset form (optional)
         setForm({ FName: "", LName: "", date: "", email: "", password: "", confirmPassword: "" });
     };
 
