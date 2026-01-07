@@ -64,7 +64,7 @@ const Signup = () => {
             setUser(meData.user); // ✅ store user in context
 
             // 4️⃣ Redirect to Purpose page
-            navigate("/purpose");
+            navigate("/login");
 
         } catch (error) {
             console.error(error);
