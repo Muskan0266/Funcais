@@ -3,6 +3,13 @@ import { Link } from "react-router-dom";
 import Logout from "../components/Logout";
 import { useStreakCookie as Streak } from "../components/Streak";
 
+const getCookie = (name) => {
+    const match = document.cookie.match(
+        new RegExp("(^| )" + name + "=([^;]+)")
+    );
+    return match ? decodeURIComponent(match[2]) : null;
+};
+
 const Profile = () => {
     const { updateDailyStreak } = Streak();
     const [streak, setStreak] = useState(0);
@@ -13,9 +20,8 @@ const Profile = () => {
     const [activity, setActivity] = useState({});
 
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const API = import.meta.env.VITE_API_URL; // Environment variable
+    const API = import.meta.env.VITE_API_URL;
 
-    // WEEKLY ACTIVITY FUNCTIONS
     const getWeeklyActivity = () => {
         return (
             JSON.parse(localStorage.getItem("weeklyActivity")) || {
@@ -43,33 +49,40 @@ const Profile = () => {
         setActivity(getWeeklyActivity());
     }, []);
 
-    // Challenges Count
+    // ---- Challenges Count (cookie) ----
     useEffect(() => {
-        const saved =
-            JSON.parse(localStorage.getItem("progress")) || {
-                cardsChallenge: false,
-                storyChallenge: false,
-            };
+        let saved = {};
+        try {
+            saved = JSON.parse(getCookie("progress") || "{}");
+        } catch {
+            saved = {};
+        }
+
         let count = 0;
         if (saved.cardsChallenge) count++;
         if (saved.storyChallenge) count++;
+
         setChallengeCount(count);
     }, []);
 
-    // Cards count
+    // ---- Cards count (cookie) ----
     useEffect(() => {
-        const progress =
-            JSON.parse(localStorage.getItem("progress")) || { swipedCount: 0 };
-        setCardsCount(progress.swipedCount);
+        let progress = {};
+        try {
+            progress = JSON.parse(getCookie("progress") || "{}");
+        } catch {
+            progress = {};
+        }
+
+        setCardsCount(progress.swipedCount || 0);
     }, []);
 
-    // Streak
     useEffect(() => {
         const newStreak = updateDailyStreak();
         setStreak(newStreak);
     }, []);
 
-    // Fetch User via cookie-based auth
+    // ---- Fetch User ----
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -104,9 +117,8 @@ const Profile = () => {
 
     const study = JSON.parse(localStorage.getItem("studyTime")) || { minutes: 0 };
     const maxVal = Math.max(...Object.values(activity), 1);
-    const jsDay = new Date().getDay(); // Sunday=0
-    const today = days[jsDay === 0 ? 6 : jsDay - 1]; // Adjusted index
-
+    const jsDay = new Date().getDay();
+    const today = days[jsDay === 0 ? 6 : jsDay - 1];
     return (
         <>
             {/* NAVIGATION */}
