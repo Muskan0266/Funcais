@@ -9,11 +9,15 @@ const AuthRoute = ({ element, authType }) => {
 
     // PUBLIC ROUTES: Landing, Login, Signup
     if (authType === "public") {
-        if (!user) return element; // not logged in, show page
+        if (!user) return element;
 
-        // logged-in user → redirect based on setup
+        // user has NOT finished setup → go to purpose
         if (!user.purpose) return <Navigate to="/purpose" replace />;
+
+        // user finished purpose but not level → go to level
         if (!user.level) return <Navigate to="/level" replace />;
+
+        // user fully set up → go to main page
         return <Navigate to="/main" replace />;
     }
 
@@ -22,10 +26,8 @@ const AuthRoute = ({ element, authType }) => {
         if (!user) return <Navigate to="/login" replace />; // not logged in
 
         // Redirect based on setup
-        if (!user.purpose && window.location.pathname !== "/purpose")
-            return <Navigate to="/purpose" replace />;
-        if (user.purpose && !user.level && window.location.pathname !== "/level")
-            return <Navigate to="/level" replace />;
+        if (!user.purpose) return <Navigate to="/purpose" replace />;
+        if (!user.level) return <Navigate to="/level" replace />;
 
         return element; // user has everything, show protected page
     }
