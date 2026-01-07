@@ -64,9 +64,11 @@ const EditProfile = () => {
             const data = await res.json();
 
             if (data.user) {
-                setMessage("Profile updated successfully");
-                setUser(data.user); // update context so other pages reflect changes
-                setTimeout(() => navigate("/profile"), 1000);
+                // ✅ Update context first
+                setUser(data.user);
+
+                // ✅ Navigate immediately to /profile
+                navigate("/profile", { replace: true });
             } else {
                 setMessage(data.message || "Failed to update profile");
             }
