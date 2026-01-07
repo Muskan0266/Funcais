@@ -78,7 +78,7 @@ const Purpose = () => {
                 })}
             </div>
 
-            <footer className='mt-15 flex justify-center'>
+            {/* <footer className='mt-15 flex justify-center'>
                 <button
                     className={`h-9 w-40 md:h-12 md:w-80 rounded font-bold px-3 mt-5 md:mt-10 text-white text-xs md:text-sm
                     ${selectedIndex !== null ? "bg-blue-700 cursor-pointer" : "bg-gray-400 cursor-not-allowed"}`}
@@ -87,7 +87,19 @@ const Purpose = () => {
                 >
                     Continue
                 </button>
-            </footer>
+            </footer> */}
+
+            <footer className='mt-15'> <Link to="/level">
+                <hr class="border-t-2 border-gray-400 w-full" />
+
+                <button className={`h-9 w-40 md:h-12 md:w-80  rounded font-bold px-3 mt-5 md:mt-10 ml-50 md:ml-250 text-white text-xs md:text-sm 
+                ${selectedIndex !== null ? "bg-blue-700 cursor-pointer" : "bg-gray-400"}`}
+                    onClick={handleContinue}
+                    disabled={selectedIndex === null}
+                >
+                    Continue
+                </button>
+            </Link></footer>
         </div>
     );
 };
