@@ -1,4 +1,7 @@
 // server.cjs
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -11,17 +14,14 @@ require("dotenv").config();
 
 const User = require("./database/User.js");
 
-// const distPath = path.join(__dirname, "client", "build");
+const distPath = path.join(__dirname, "../../Frontend/dist");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ----- MONGO CONNECTION -----
 mongoose
-    .connect(process.env.MONGO_URL, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
+    .connect(process.env.MONGO_URL)
     .then(() => console.log("MongoDB Connected"))
     .catch((err) => {
         console.error("MongoDB connection error:", err);
@@ -32,25 +32,23 @@ mongoose
 app.set("trust proxy", 1); // for HTTPS behind proxies
 app.use(express.json());
 app.use(cookieParser());
-// app.use(express.static(distPath))
+app.use(express.static(distPath))
 
 // ----- CORS CONFIG -----
 app.use(
     cors({
-        origin: process.env.FRONTEND_URL, // deployed frontend
-        credentials: true, // allow cookies
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"],
+        origin: "http://localhost:5173", // your frontend local URL
+        credentials: true,
     })
 );
 
 // ----- COOKIE OPTIONS -----
 const cookieOptions = {
     httpOnly: true,
-    secure: true,          // Render is HTTPS
-    sameSite: "none",      // required for cross-site cookies
+    secure: false,
+    sameSite: "lax",
     path: "/",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 // ----- AUTH MIDDLEWARE -----
@@ -175,10 +173,10 @@ app.post("/editProfile", async (req, res) => {
     }
 });
 
-// app.get(/.*/, (req, res) => {
-//     res.sendFile(path.join(distPath, "index.html"));
+app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
 
-// })
+})
 
 // ----- START SERVER -----
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`))

@@ -5,6 +5,7 @@ import FrontImage from '../images/frontt.png'
 const Landing = () => {
     return (
         <>
+
             <div className="bg_image h-150 md:h-200">
 
                 {/* NAVBAR */}
@@ -40,7 +41,7 @@ const Landing = () => {
                         </p>
 
                         {/* Subtitle */}
-                        <p className="text-sm md:text-2xl font-serif text-blue-700 mt-2 ml-0 md:ml-5">
+                        <p className="text-sm md:text-2xl font-serif text-blue-700 mt-3 ml-0 md:ml-5">
                             A modern and social <br className="block md:hidden" /> approach to learning French
                         </p>
 
@@ -71,11 +72,11 @@ const Landing = () => {
                                 <div className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-red-600"></div>
                             </div>
 
-                            <span className="load1 material-symbols-outlined text-blue-700 scale-[2] md:scale-[4] mt-10 md:mt-32 ml-30 md:ml-10 -rotate-145 md:-rotate-130">
+                            <span className="load1 material-symbols-outlined text-blue-700 scale-[2] md:scale-[4] mt-10 md:mt-32 ml-30 md:ml-24 -rotate-145 md:-rotate-130">
                                 switch_access_shortcut
                             </span>
 
-                            <div className="block md:hidden w-55 md:w-70 ml-5 md:ml-90 relative -pt-7 md:pt-30">
+                            <div className="w-60 md:w-60 md:relative md:-top-7 ml-5 md:-left-50">
                                 <p className="load1 text-xs md:text-lg">
                                     Your practical <br className='block md:hidden' /> guide to ordering at a{' '}
                                     <span className="font-serif text-red-600">Parisian café</span> and having your first simple French conversation.
