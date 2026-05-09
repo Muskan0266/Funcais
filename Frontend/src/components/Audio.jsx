@@ -12,7 +12,7 @@ export default function AudioPlayer({ text, language = "fr-FR" }) {
     const wordsRef = useRef([]);
     const wordIndexRef = useRef(0);
 
-    // --- Safe stop utility ---
+
     const stopSpeech = () => {
         if (typeof window === "undefined") return;
         window.speechSynthesis?.cancel();
@@ -21,7 +21,7 @@ export default function AudioPlayer({ text, language = "fr-FR" }) {
         setIsPlaying(false);
     };
 
-    // --- Recalculate when text changes ---
+
     useEffect(() => {
         wordsRef.current = text?.trim()?.length ? text.trim().split(/\s+/) : [];
         const totalWords = wordsRef.current.length;
@@ -32,12 +32,12 @@ export default function AudioPlayer({ text, language = "fr-FR" }) {
         stopSpeech();
     }, [text]);
 
-    // --- Cleanup on unmount ---
+
     useEffect(() => {
         return () => stopSpeech();
     }, []);
 
-    // --- Ensure voices load (Chrome bug fix) ---
+
     useEffect(() => {
         if (typeof window === "undefined") return;
         window.speechSynthesis?.getVoices();
@@ -82,7 +82,7 @@ export default function AudioPlayer({ text, language = "fr-FR" }) {
             timerRef.current = null;
         };
 
-        // Simulated progress
+
         const wordsRemaining = wordsRef.current.length - wordIndexRef.current;
         const interval = 0.2;
         const totalTime = (wordsRemaining / 200) * 60;

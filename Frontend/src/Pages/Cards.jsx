@@ -227,8 +227,23 @@ const Cards = () => {
 
     if (!card) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen">
-                <h1 className="text-4xl font-bold">🎉 All Cards Completed!</h1>
+            <div>
+                <Navbar />
+
+                <div className="flex flex-col items-center justify-center min-h-screen">
+                    <h1 className="text-4xl font-bold text-[#43406e]">
+                        🎉 All Cards Completed!
+                    </h1>
+
+                    <button
+                        onClick={resetProgress}
+                        className="mt-8 bg-[#43406e] text-white px-6 py-3 rounded-xl hover:bg-[#5a578d]"
+                    >
+                        Restart Cards
+                    </button>
+                </div>
+
+                <Footer />
             </div>
         )
     }

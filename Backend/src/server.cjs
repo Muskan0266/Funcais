@@ -1,182 +1,60 @@
-// server.cjs
+
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-const path = require("path");
-
 require("dotenv").config();
 
-const User = require("./database/User.js");
+const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
-const distPath = path.join(__dirname, "../../Frontend/dist");
+const connectDB = require("./db");
+const handleUserRoutes = require("./routes/user");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ----- MONGO CONNECTION -----
-mongoose
-    .connect(process.env.MONGO_URL)
-    .then(() => console.log("MongoDB Connected"))
-    .catch((err) => {
-        console.error("MongoDB connection error:", err);
-        process.exit(1);
-    });
+// Validate env
+if (!process.env.MONGO_URL) {
+    console.error("MONGO_URL missing");
+    process.exit(1);
+}
 
-// ----- MIDDLEWARE -----
-app.set("trust proxy", 1); // for HTTPS behind proxies
+// Connect DB
+connectDB(process.env.MONGO_URL);
+
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(distPath))
 
-// ----- CORS CONFIG -----
 app.use(
     cors({
-        origin: "http://localhost:5173", // your frontend local URL
+        origin: process.env.FRONTEND_URL || "http://localhost:5173",
         credentials: true,
     })
 );
 
-// ----- COOKIE OPTIONS -----
+// Cookie config
+const isProduction = process.env.NODE_ENV === "production";
+
 const cookieOptions = {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
-// ----- AUTH MIDDLEWARE -----
-const requireAuth = (req, res, next) => {
-    try {
-        const token = req.cookies.token;
-        if (!token) return res.status(401).json({ message: "Not authenticated" });
+// Routes
+app.use("/api/users", handleUserRoutes);
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.userId = decoded.id;
-        next();
-    } catch (err) {
-        console.error("Auth error:", err);
-        res.status(401).json({ message: "Invalid or expired token" });
-    }
-};
-
-// ----- ROUTES -----
-
-// SIGNUP
-app.post("/signup", async (req, res) => {
-    try {
-        const { FName, LName, date, email, password } = req.body;
-        if (!FName || !LName || !email || !password)
-            return res.status(400).json({ message: "Missing required fields" });
-
-        const existing = await User.findOne({ email });
-        if (existing) return res.status(400).json({ message: "Email already registered" });
-
-        const hashedPass = await bcrypt.hash(password, 10);
-        const user = new User({ FName, LName, date, email, password: hashedPass });
-        await user.save();
-
-        res.status(201).json({ message: "Account created successfully", setupComplete: false });
-    } catch (err) {
-        console.error("Signup error:", err);
-        res.status(500).json({ message: "Server error" });
-    }
+// Error handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: "Server error" });
 });
 
-// LOGIN
-app.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ message: "User not found" });
-
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) return res.status(400).json({ message: "Wrong password" });
-
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "3d" });
-
-        res.cookie("token", token, cookieOptions);
-        res.json({ message: "Login successful", setupComplete: !!user.level && !!user.purpose });
-    } catch (err) {
-        console.error("Login error:", err);
-        res.status(500).json({ message: "Server error" });
-    }
-});
-
-// AUTH ME
-app.get("/auth/me", requireAuth, async (req, res) => {
-    try {
-        const user = await User.findById(req.userId).select("-password");
-        res.json({ user, setupComplete: !!user.level && !!user.purpose });
-    } catch (err) {
-        console.error("Auth/me error:", err);
-        res.status(500).json({ message: "Server error" });
-    }
-});
-
-// SAVE PURPOSE
-app.post("/purpose", requireAuth, async (req, res) => {
-    try {
-        const { purpose } = req.body;
-        await User.findByIdAndUpdate(req.userId, { purpose });
-        res.json({ message: "Purpose saved successfully", purpose });
-    } catch (err) {
-        console.error("Save purpose error:", err);
-        res.status(500).json({ message: "Server error" });
-    }
-});
-
-// SAVE LEVEL
-app.post("/level", requireAuth, async (req, res) => {
-    try {
-        const { level } = req.body;
-        await User.findByIdAndUpdate(req.userId, { level });
-        res.json({ message: "Level saved successfully", level });
-    } catch (err) {
-        console.error("Save level error:", err);
-        res.status(500).json({ message: "Server error" });
-    }
-});
-
-// LOGOUT
-app.get("/logout", (req, res) => {
-    res.clearCookie("token", cookieOptions);
-    res.json({ message: "Logged out successfully" });
-});
-
-//Edit Profile data
-app.post("/editProfile", async (req, res) => {
-    try {
-        const token = req.cookies.token;
-        if (!token) return res.status(401).json({ message: "Not authenticated" });
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        const { FName, LName, Level, Date } = req.body;
-
-        const updatedUser = await User.findByIdAndUpdate(
-            decoded.id,
-            { FName, LName, level: Level, date: Date },
-            { new: true }
-        ).select("-password");
-
-        res.json({ message: "Profile updated", user: updatedUser });
-    } catch (err) {
-        console.error("EditProfile error:", err);
-        res.status(500).json({ message: "Server error" });
-    }
-});
-
-app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
-
-})
-
-// ----- START SERVER -----
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`))
+// Start server
+app.listen(PORT, () =>
+    console.log(`Server running at http://localhost:${PORT}`)
+);

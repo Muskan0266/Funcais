@@ -95,7 +95,7 @@ const Story = () => {
             <nav className="h-20 shadow-lg shadow-black/50 bg-white flex justify-between items-center fixed top-0 left-0 right-0 z-50">
                 <div className="pl-5 cursor-pointer text-sm md:text-2xl font-bold">
                     <span className="bg-linear-to-r from-blue-800 to-red-700 bg-clip-text text-transparent">
-                        FrAmusant
+                        Funçais
                     </span>
                 </div>
                 <p className="font-bold text-black text-lg md:text-2xl">
