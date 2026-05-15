@@ -1,18 +1,19 @@
-const express = require("express");
-const router = express.Router();
-const cors = require("cors");
+import express, { Request, Response, NextFunction } from "express";
+import cors from "cors";
 
-const requireAuth = require("../middleware/requireAuth");
+import requireAuth from "../middleware/requireAuth";
 
-const {
+import {
     handleSignup,
     handleLogin,
     getMe,
     savePurpose,
     saveLevel,
     editProfile,
-    handleLogout
-} = require("../controller/user");
+    handleLogout,
+} from "../controller/user";
+
+const router = express.Router();
 
 // PUBLIC
 router.post("/signup", handleSignup);
@@ -27,4 +28,4 @@ router.post("/editProfile", requireAuth, editProfile);
 // LOGOUT
 router.get("/logout", handleLogout);
 
-module.exports = router;
+export default router;
