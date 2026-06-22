@@ -2,31 +2,43 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 
-export default function Logout({ className = "" }) {
-    const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
+interface LogoutProps {
+    className?: string;
+    onCloseMenu?: () => void;
+}
 
-    async function handleLogout() {
+export default function Logout({
+    className = "",
+    onCloseMenu,
+}: LogoutProps) {
+    const navigate = useNavigate();
+
+    const [open, setOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    async function handleLogout(): Promise<void> {
         if (loading) return;
+
         setLoading(true);
 
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
-                method: "GET",
-                credentials: "include"        // <-- clear cookie in backend
-            });
+            await fetch(
+                `${import.meta.env.VITE_API_URL}/logout`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                }
+            );
         } catch (err) {
             console.error("Logout failed:", err);
         }
-
 
         localStorage.removeItem("setupComplete");
 
         setOpen(false);
         setLoading(false);
-        window.location.href = "/";
 
+        window.location.href = "/";
     }
 
     return (
@@ -42,7 +54,10 @@ export default function Logout({ className = "" }) {
                 createPortal(
                     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                         <div className="bg-white rounded-2xl shadow-xl p-6 w-[90%] max-w-md">
-                            <h2 className="text-xl font-semibold mb-2">Log out?</h2>
+                            <h2 className="text-xl font-semibold mb-2">
+                                Log out?
+                            </h2>
+
                             <p className="text-gray-600 mb-6">
                                 You’ll need to sign in again to continue.
                             </p>
@@ -60,7 +75,9 @@ export default function Logout({ className = "" }) {
                                     disabled={loading}
                                     className="px-4 py-2 rounded-xl bg-blue-600 text-white hover:cursor-pointer disabled:opacity-60"
                                 >
-                                    {loading ? "Logging out..." : "Yes, logout"}
+                                    {loading
+                                        ? "Logging out..."
+                                        : "Yes, logout"}
                                 </button>
                             </div>
                         </div>
