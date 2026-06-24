@@ -7,12 +7,17 @@ import {
     type SetStateAction,
 } from "react";
 
-interface User {
+export interface User {
+    FName?: string;
+    LName?: string;
+    level?: string;
     purpose?: string;
+    createdAt?: string;
+    _id?: string;
     [key: string]: unknown;
 }
 
-interface UserContextType {
+export interface UserContextType {
     user: User | null;
     setUser: Dispatch<SetStateAction<User | null>>;
     loading: boolean;

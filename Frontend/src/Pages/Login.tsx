@@ -1,56 +1,118 @@
-// src/Pages/Login.jsx
-import React, { useState, useContext } from "react";
+import {
+  useState,
+  useContext,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import { Link } from "react-router-dom";
 import Google from "../images/google.png";
 import Facebook from "../images/facebook.png";
 import Apple from "../images/apple.png";
-import { UserContext } from "../components/UserContext";
+import {
+  UserContext,
+  type UserContextType,
+  type User,
+} from "../components/UserContext";
+
+interface LoginForm {
+  email: string;
+  password: string;
+}
+
+interface LoginResponse {
+  message?: string;
+}
+
+interface MeResponse {
+  user: User;
+}
 
 const Login = () => {
-  const { setUser } = useContext(UserContext);
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [err, setErr] = useState("");
-  const [msg, setMsg] = useState("");
+  const { setUser } = useContext(
+    UserContext
+  ) as UserContextType;
+
+  const [form, setForm] = useState<LoginForm>({
+    email: "",
+    password: "",
+  });
+
+  const [err, setErr] = useState<string>("");
+  const [msg, setMsg] = useState<string>("");
 
   const API = import.meta.env.VITE_API_URL;
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement>
+  ): void => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (
+    e: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
+
     setErr("");
     setMsg("");
 
     try {
-      // 1️⃣ Login
+      // Login
       const res = await fetch(`${API}/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
         body: JSON.stringify(form),
       });
 
-      const data = await res.json();
+      const data: LoginResponse =
+        await res.json();
+
       if (!res.ok) {
-        setErr(data.message || "Wrong email or password");
+        setErr(
+          data.message ||
+          "Wrong email or password"
+        );
         return;
       }
 
       setMsg("Login successful");
-      setForm({ email: "", password: "" });
 
-      // 2️⃣ Fetch user after login and set in context
-      const meRes = await fetch(`${API}/auth/me`, { credentials: "include" });
-      if (!meRes.ok) throw new Error("Failed to fetch user");
-      const meData = await meRes.json();
-      setUser(meData.user); // ✅ AuthRoute will redirect automatically
+      setForm({
+        email: "",
+        password: "",
+      });
 
+      // Fetch logged-in user
+      const meRes = await fetch(
+        `${API}/auth/me`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (!meRes.ok) {
+        throw new Error(
+          "Failed to fetch user"
+        );
+      }
+
+      const meData: MeResponse =
+        await meRes.json();
+
+      setUser(meData.user);
     } catch (error) {
       console.error(error);
-      setErr("Server error — please try again");
+      setErr(
+        "Server error — please try again"
+      );
     }
   };
-
 
   return (
     <div className="bg-white/80 p-10 mt-10 md:mt-25 rounded-2xl shadow-lg w-[80%] md:w-[60%] mx-auto max-w-[800px]">
@@ -94,8 +156,13 @@ const Login = () => {
               />
             </div>
 
-            <p className="text-red-600 text-sm text-center pt-5">{err}</p>
-            <p className="text-green-600 text-sm text-center pt-5">{msg}</p>
+            <p className="text-red-600 text-sm text-center pt-5">
+              {err}
+            </p>
+
+            <p className="text-green-600 text-sm text-center pt-5">
+              {msg}
+            </p>
 
             <button
               type="submit"
@@ -106,21 +173,35 @@ const Login = () => {
           </form>
 
           <div className="flex justify-center items-center mt-5">
-            <p className="text-gray-500 text-sm">or</p>
+            <p className="text-gray-500 text-sm">
+              or
+            </p>
           </div>
 
           <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
-            <img className="h-5 w-5" src={Google} alt="Google" />
+            <img
+              className="h-5 w-5"
+              src={Google}
+              alt="Google"
+            />
             <p>Continue with Google</p>
           </button>
 
           <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
-            <img className="h-5 w-5" src={Apple} alt="Apple" />
+            <img
+              className="h-5 w-5"
+              src={Apple}
+              alt="Apple"
+            />
             <p>Continue with Apple</p>
           </button>
 
           <button className="flex items-center justify-center gap-x-3 h-12 w-65 md:w-80 border-2 rounded-lg border-black px-3 mt-5 text-black text-sm hover:bg-blue-100">
-            <img className="h-5 w-5" src={Facebook} alt="Facebook" />
+            <img
+              className="h-5 w-5"
+              src={Facebook}
+              alt="Facebook"
+            />
             <p>Continue with Facebook</p>
           </button>
         </div>
