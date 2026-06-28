@@ -8,17 +8,12 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import connectDB from "./db";
+import connectDB from "./config/db";
 import handleUserRoutes from "./routes/user";
 
 const app = express();
 const PORT: number = Number(process.env.PORT) || 3000;
 
-// Validate env
-if (!process.env.MONGO_URL) {
-    console.error("MONGO_URL missing");
-    process.exit(1);
-}
 
 // Connect DB
 connectDB(process.env.MONGO_URL);
