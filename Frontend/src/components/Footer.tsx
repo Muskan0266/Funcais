@@ -1,17 +1,22 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const Footer = () => {
     return (
         <footer className="w-full p-2 h-8 md:h-15 bg-black flex items-center justify-center gap-x-4 md:gap-x-6">
-            {/* Navigation Links */}
             <div className="flex gap-x-4 font-sans text-gray-300 text-lg">
-                <Link to="/"><p>Home</p></Link>
-                <Link to="/contact"><p>Contact</p></Link>
-                <Link to="/about"><p>About</p></Link>
+                <Link to="/">
+                    <p>Home</p>
+                </Link>
+
+                <Link to="/contact">
+                    <p>Contact</p>
+                </Link>
+
+                <Link to="/about">
+                    <p>About</p>
+                </Link>
             </div>
 
-            {/* Social Media Icons */}
             <div className="flex gap-x-3 ml-6">
                 <a
                     href="https://www.instagram.com/_muskan.2626?igsh=MWR1NjlvMnFjbHd0dA=="

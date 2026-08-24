@@ -9,47 +9,91 @@ import laptop from '../images/laptop.png'
 import sofa from '../images/sofa.png'
 import StudyTime from '../components/StudyTime'
 
-const getCookie = (name) => {
+const getCookie = (name: string): string | null => {
     const match = document.cookie.match(
         new RegExp("(^| )" + name + "=([^;]+)")
-    )
-    return match ? decodeURIComponent(match[2]) : null
-}
+    );
 
-const setCookie = (name, value, days = 365) => {
-    const expires = new Date()
-    expires.setDate(expires.getDate() + days)
+    return match ? decodeURIComponent(match[2] ?? "") : null;
+};
+
+const setCookie = (
+    name: string,
+    value: string,
+    days: number = 365
+): void => {
+    const expires = new Date();
+
+    expires.setDate(expires.getDate() + days);
 
     document.cookie =
         `${name}=${encodeURIComponent(value)};` +
-        `expires=${expires.toUTCString()};path=/;SameSite=Lax`
-}
+        `expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+};
 
-const removeCookie = (name) => {
+const removeCookie = (name: string): void => {
     document.cookie =
-        `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;SameSite=Lax`
+        `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;SameSite=Lax`;
+};
+
+interface SavedData {
+    currentIndex?: number;
+    swipedCount?: number;
+    countCorrect?: number;
+    countIncorrect?: number;
+    quizCompleted?: boolean;
+    streakDate?: string | null;
+    Streak?: number;
 }
 
 const Cards = () => {
-    const { studyMinutes } = StudyTime()
+    const { studyMinutes } = StudyTime();
 
-    let savedData = {}
+    let savedData: SavedData = {};
+
     try {
-        savedData = JSON.parse(getCookie("progress") || "{}")
+        savedData = JSON.parse(
+            getCookie("progress") || "{}"
+        ) as SavedData;
     } catch {
-        savedData = {}
+        savedData = {};
     }
 
-    const [currentIndex, setCurrentIndex] = useState(savedData.currentIndex ?? 0)
-    const [flashColor, setFlashColor] = useState("")
-    const [showCorrect, setshowCorrect] = useState(null)
-    const [swipedCount, setSwipedCount] = useState(savedData.swipedCount ?? 0)
-    const [countCorrect, setcountCorrect] = useState(savedData.countCorrect ?? 0)
-    const [countIncorrect, setcountIncorrect] = useState(savedData.countIncorrect ?? 0)
-    const [quizCompleted, setQuizCompleted] = useState(savedData.quizCompleted ?? false)
-    const [streakDate, setstreakDate] = useState(savedData.streakDate ?? null)
-    const [Streak, setStreak] = useState(savedData.Streak ?? 0)
-    const [cardsChallenge, setcardsChallenge] = useState(false)
+    const [currentIndex, setCurrentIndex] = useState<number>(
+        savedData.currentIndex ?? 0
+    );
+
+    const [flashColor, setFlashColor] = useState<string>("");
+
+    const [showCorrect, setshowCorrect] =
+        useState<string | null>(null);
+
+    const [swipedCount, setSwipedCount] = useState<number>(
+        savedData.swipedCount ?? 0
+    );
+
+    const [countCorrect, setcountCorrect] = useState<number>(
+        savedData.countCorrect ?? 0
+    );
+
+    const [countIncorrect, setcountIncorrect] = useState<number>(
+        savedData.countIncorrect ?? 0
+    );
+
+    const [quizCompleted, setQuizCompleted] = useState<boolean>(
+        savedData.quizCompleted ?? false
+    );
+
+    const [streakDate, setstreakDate] = useState<string | null>(
+        savedData.streakDate ?? null
+    );
+
+    const [Streak, setStreak] = useState<number>(
+        savedData.Streak ?? 0
+    );
+
+    const [cardsChallenge, setcardsChallenge] =
+        useState<boolean>(false);
 
     const cards = [
         { img: bathtub, name: "Le frigo", correctName: "La baignore", margin: "-top-5", height: "h-70 md:h-80", width: "w-70 md:w-80" },
@@ -205,16 +249,29 @@ const Cards = () => {
     const correctPercent = (countCorrect / cards.length) * 100
     const incorrectPercent = (countIncorrect / cards.length) * 100
 
-    const speak = (text, lang = 'fr-FR') => {
-        window.speechSynthesis.cancel()
-        const utterance = new SpeechSynthesisUtterance(text)
-        utterance.lang = lang
-        const voices = window.speechSynthesis.getVoices()
-        const voice = voices.find(v => v.lang.startsWith("fr"))
-        if (voice) utterance.voice = voice
-        window.speechSynthesis.speak(utterance)
-    }
+    const speak = (
+        text: string,
+        lang: string = "fr-FR"
+    ): void => {
+        window.speechSynthesis.cancel();
 
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        utterance.lang = lang;
+
+        const voices: SpeechSynthesisVoice[] =
+            window.speechSynthesis.getVoices();
+
+        const voice = voices.find((v) =>
+            v.lang.startsWith("fr")
+        );
+
+        if (voice) {
+            utterance.voice = voice;
+        }
+
+        window.speechSynthesis.speak(utterance);
+    };
     useEffect(() => {
         window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices()
     }, [])
@@ -227,8 +284,23 @@ const Cards = () => {
 
     if (!card) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen">
-                <h1 className="text-4xl font-bold">🎉 All Cards Completed!</h1>
+            <div>
+                <Navbar />
+
+                <div className="flex flex-col items-center justify-center min-h-screen">
+                    <h1 className="text-4xl font-bold text-[#43406e]">
+                        🎉 All Cards Completed!
+                    </h1>
+
+                    <button
+                        onClick={resetProgress}
+                        className="mt-8 bg-[#43406e] text-white px-6 py-3 rounded-xl hover:bg-[#5a578d]"
+                    >
+                        Restart Cards
+                    </button>
+                </div>
+
+                <Footer />
             </div>
         )
     }

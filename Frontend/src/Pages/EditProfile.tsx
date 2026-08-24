@@ -1,91 +1,144 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, type ChangeEvent, } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../components/UserContext";
 
+interface User {
+    FName?: string;
+    LName?: string;
+    level?: string;
+    date?: string;
+    [key: string]: unknown;
+}
+
+interface UserContextType {
+    user: User | null;
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
+    loading: boolean;
+}
+
+interface FormData {
+    FName: string;
+    LName: string;
+    Level: string;
+    Date: string;
+}
+
 const EditProfile = () => {
     const navigate = useNavigate();
-    const { user, setUser } = useContext(UserContext);
-    const [msg, setMsg] = useState("")
 
-    const [form, setForm] = useState({
+    const { user, setUser } = useContext(
+        UserContext
+    ) as UserContextType;
+
+    const [msg, setMsg] = useState<string>("");
+
+    const [form, setForm] = useState<FormData>({
         FName: "",
         LName: "",
         Level: "",
         Date: "",
     });
 
-    const [message, setMessage] = useState("");
-
     const API = import.meta.env.VITE_API_URL;
 
-    // Pre-fill form with current user data
     useEffect(() => {
         if (user) {
             setForm({
-                FName: user.FName || "",
-                LName: user.LName || "",
-                Level: user.level || "",
-                Date: user.date ? user.date.split("T")[0] : "",
+                FName: user.FName?.toString() || "",
+                LName: user.LName?.toString() || "",
+                Level: user.level?.toString() || "",
+                Date: user.date
+                    ? user.date.split("T")[0]
+                    : "",
             });
         }
     }, [user]);
 
     const isFormEmpty =
-        !form.FName && !form.LName && !form.Level && !form.Date;
+        !form.FName &&
+        !form.LName &&
+        !form.Level &&
+        !form.Date;
 
-    function handleForm(e) {
+    const handleForm = (
+        e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
         setForm({
             ...form,
             [e.target.name]: e.target.value,
         });
-    }
+    };
 
-    async function edit() {
+    const edit = async (): Promise<void> => {
         try {
-            const updatedData = {};
-            const mapping = {
+            const updatedData: Record<string, string> = {};
+
+            const mapping: Record<
+                keyof FormData,
+                string
+            > = {
                 FName: "FName",
                 LName: "LName",
                 Level: "level",
                 Date: "date",
             };
 
-            Object.keys(form).forEach((key) => {
-                if (form[key] !== "" && form[key] !== user?.[mapping[key]]) {
-                    updatedData[mapping[key]] = form[key];
+            (Object.keys(form) as (keyof FormData)[]).forEach(
+                (key) => {
+                    if (
+                        form[key] !== "" &&
+                        form[key] !==
+                        String(
+                            user?.[
+                            mapping[key] as keyof User
+                            ] ?? ""
+                        )
+                    ) {
+                        updatedData[mapping[key]] =
+                            form[key];
+                    }
                 }
-            });
+            );
 
             if (Object.keys(updatedData).length === 0) {
                 setMsg("No changes to update.");
                 return;
             }
 
-            const res = await fetch(`${API}/editProfile`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updatedData),
-            });
+            const res = await fetch(
+                `${API}/editProfile`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+                    },
+                    body: JSON.stringify(updatedData),
+                }
+            );
 
-            const data = await res.json();
+            const data: { user?: User } =
+                await res.json();
 
             if (data.user) {
                 setUser(data.user);
 
-                // 🔹 Show success text
-                setMsg("Profile updated successfully!");
+                setMsg(
+                    "Profile updated successfully!"
+                );
 
-                // 🔹 Redirect AFTER 1 second
                 setTimeout(() => {
                     navigate("/profile");
                 }, 1000);
             }
         } catch (err) {
             console.error(err);
-            setMsg("Server error while updating profile");
+            setMsg(
+                "Server error while updating profile"
+            );
         }
-    }
+    };
 
     return (
         <div>

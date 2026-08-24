@@ -1,75 +1,107 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Volume2, Play, Pause } from "lucide-react";
 
-export default function AudioPlayer({ text, language = "fr-FR" }) {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [volume, setVolume] = useState(0.7);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
+interface AudioPlayerProps {
+    text: string;
+    language?: string;
+}
 
-    const utteranceRef = useRef(null);
-    const timerRef = useRef(null);
-    const wordsRef = useRef([]);
-    const wordIndexRef = useRef(0);
+export default function AudioPlayer({
+    text,
+    language = "fr-FR",
+}: AudioPlayerProps) {
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [volume, setVolume] = useState<number>(0.7);
+    const [currentTime, setCurrentTime] = useState<number>(0);
+    const [duration, setDuration] = useState<number>(0);
 
-    // --- Safe stop utility ---
+    const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const wordsRef = useRef<string[]>([]);
+    const wordIndexRef = useRef<number>(0);
+
     const stopSpeech = () => {
         if (typeof window === "undefined") return;
+
         window.speechSynthesis?.cancel();
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
+
         setIsPlaying(false);
     };
 
-    // --- Recalculate when text changes ---
     useEffect(() => {
-        wordsRef.current = text?.trim()?.length ? text.trim().split(/\s+/) : [];
+        wordsRef.current = text?.trim()?.length
+            ? text.trim().split(/\s+/)
+            : [];
+
         const totalWords = wordsRef.current.length;
         const estimatedDuration = (totalWords / 200) * 60;
+
         setDuration(estimatedDuration || 0);
         setCurrentTime(0);
         wordIndexRef.current = 0;
+
         stopSpeech();
     }, [text]);
 
-    // --- Cleanup on unmount ---
     useEffect(() => {
         return () => stopSpeech();
     }, []);
 
-    // --- Ensure voices load (Chrome bug fix) ---
     useEffect(() => {
         if (typeof window === "undefined") return;
+
         window.speechSynthesis?.getVoices();
+
         const handler = () => window.speechSynthesis?.getVoices();
-        window.speechSynthesis?.addEventListener?.("voiceschanged", handler);
+
+        window.speechSynthesis?.addEventListener?.(
+            "voiceschanged",
+            handler
+        );
+
         return () =>
-            window.speechSynthesis?.removeEventListener?.("voiceschanged", handler);
+            window.speechSynthesis?.removeEventListener?.(
+                "voiceschanged",
+                handler
+            );
     }, []);
 
     const speak = () => {
         if (typeof window === "undefined") return;
 
-        // Pause
         if (isPlaying) {
             stopSpeech();
             return;
         }
 
-        // Prevent overlapping audio
         stopSpeech();
 
         if (wordIndexRef.current >= wordsRef.current.length) return;
 
-        const remainingText = wordsRef.current.slice(wordIndexRef.current).join(" ");
+        const remainingText = wordsRef.current
+            .slice(wordIndexRef.current)
+            .join(" ");
+
         const utterance = new SpeechSynthesisUtterance(remainingText);
+
         utterance.lang = language;
 
         const voices = window.speechSynthesis.getVoices();
+
+        const langPrefix = language.split("-")[0] ?? "";
+
         const voice = voices.find((v) =>
-            v.lang.startsWith(language.split("-")[0])
+            v.lang.startsWith(langPrefix)
         );
-        if (voice) utterance.voice = voice;
+
+        if (voice) {
+            utterance.voice = voice;
+        }
 
         utterance.volume = volume;
         utterance.rate = 0.5;
@@ -78,50 +110,79 @@ export default function AudioPlayer({ text, language = "fr-FR" }) {
             setIsPlaying(false);
             setCurrentTime(duration);
             wordIndexRef.current = wordsRef.current.length;
-            clearInterval(timerRef.current);
-            timerRef.current = null;
+
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
         };
 
-        // Simulated progress
-        const wordsRemaining = wordsRef.current.length - wordIndexRef.current;
+        const wordsRemaining =
+            wordsRef.current.length - wordIndexRef.current;
+
         const interval = 0.2;
+
         const totalTime = (wordsRemaining / 200) * 60;
 
         timerRef.current = setInterval(() => {
             setCurrentTime((prev) => {
                 const next = prev + interval;
+
                 const approxIndex = Math.floor(
                     (next / duration) * wordsRef.current.length
                 );
+
                 wordIndexRef.current = approxIndex;
-                if (next >= duration) clearInterval(timerRef.current);
+
+                if (next >= duration && timerRef.current) {
+                    clearInterval(timerRef.current);
+                }
+
                 return Math.min(next, duration);
             });
         }, interval * 1000);
 
         utteranceRef.current = utterance;
+
         window.speechSynthesis.speak(utterance);
+
         setIsPlaying(true);
     };
 
-    const handleVolume = (e) => {
+    const handleVolume = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
         const vol = parseFloat(e.target.value);
+
         setVolume(vol);
-        if (utteranceRef.current) utteranceRef.current.volume = vol;
+
+        if (utteranceRef.current) {
+            utteranceRef.current.volume = vol;
+        }
     };
 
-    const handleSeek = (e) => {
+    const handleSeek = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
         const seekTime = parseFloat(e.target.value);
+
         setCurrentTime(seekTime);
+
         const totalWords = wordsRef.current.length;
-        const wordIndex = Math.floor((seekTime / duration) * totalWords);
+
+        const wordIndex = Math.floor(
+            (seekTime / duration) * totalWords
+        );
+
         wordIndexRef.current = wordIndex;
+
         stopSpeech();
     };
 
-    const formatTime = (sec) => {
+    const formatTime = (sec: number): string => {
         const m = Math.floor(sec / 60);
         const s = Math.floor(sec % 60);
+
         return `${m}:${s < 10 ? "0" + s : s}`;
     };
 

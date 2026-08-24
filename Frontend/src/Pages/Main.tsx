@@ -1,17 +1,42 @@
-import React, { useState, useContext } from "react";
+import {
+    useState,
+    useContext,
+    type ReactNode,
+} from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { UserContext } from "../components/UserContext";
 
+interface SliderItem {
+    id: number;
+    content: ReactNode;
+}
+
 const Main = () => {
-    const [index, setIndex] = useState(0);
-    const { loading, user } = useContext(UserContext);
+    const [index, setIndex] = useState<number>(0);
 
-    if (loading) return <div className="text-center mt-20">Loading...</div>;
-    if (!user) return null; // redirect handled by AuthRoute
+    const context = useContext(UserContext);
 
-    const arr = [
+    if (!context) {
+        return null;
+    }
+
+    const { loading, user } = context;
+
+    if (loading) {
+        return (
+            <div className="text-center mt-20">
+                Loading...
+            </div>
+        );
+    }
+
+    if (!user) {
+        return null;
+    }
+
+    const arr: SliderItem[] = [
         {
             id: 0,
             content: (
@@ -20,6 +45,7 @@ const Main = () => {
                         <p className="text-sm md:text-2xl font-extrabold font-serif text-white pt-20 md:pt-59">
                             FlashCards
                         </p>
+
                         <p className="text-xs md:text-lg text-white mt-1">
                             Test your vocabulary knowledge with interactive swipe cards!
                         </p>
@@ -32,18 +58,15 @@ const Main = () => {
             id: 1,
             content: (
                 <Link to="/story">
-
                     <div className="slider_story h-[170px] w-[300px] md:h-[350px] md:w-[550px] border-2 border-[#43406e] rounded-2xl hover:shadow-2xl hover:shadow-black/70 transition duration-300 p-5 bg-white">
-                        <p className="text-sm md:text-2xl font-extrabold font-serif text-white ">
+                        <p className="text-sm md:text-2xl font-extrabold font-serif text-white">
                             Listening and Answering
                         </p>
-                        <p className="text-xs md:text-lg text-white  md:mt-1 ">
+
+                        <p className="text-xs md:text-lg text-white md:mt-1">
                             Listen to small stories and answering questions.
                         </p>
-
                     </div>
-
-
                 </Link>
             ),
         },
@@ -52,37 +75,45 @@ const Main = () => {
             id: 2,
             content: (
                 <Link to="/photoWord">
-                    <div className="slider_camera h-[170px] w-[300px] md:h-[350px] md:w-[550px] border-2 border-[#43406e] rounded-2xl  hover:shadow-2xl hover:shadow-black/70 transition duration-300 p-5 bg-white">
+                    <div className="slider_camera h-[170px] w-[300px] md:h-[350px] md:w-[550px] border-2 border-[#43406e] rounded-2xl hover:shadow-2xl hover:shadow-black/70 transition duration-300 p-5 bg-white">
                         <p className="text-sm md:text-2xl font-extrabold font-serif text-white pt-20 md:pt-59">
                             Photo-to-word
                         </p>
-                        <p className="text-xs md:text-lg text-white mt-1">Learn French from anything you see in just a click! </p>
+
+                        <p className="text-xs md:text-lg text-white mt-1">
+                            Learn French from anything you see in just a click!
+                        </p>
                     </div>
-
-
                 </Link>
             ),
         },
     ];
 
-    function next() {
-        setIndex((prev) => (prev + 1) % arr.length);
-    }
+    const next = (): void => {
+        setIndex(
+            (prev: number) =>
+                (prev + 1) % arr.length
+        );
+    };
 
-    function prev() {
-        setIndex((prev) => (prev - 1 + arr.length) % arr.length);
-    }
+    const prev = (): void => {
+        setIndex(
+            (prev: number) =>
+                (prev - 1 + arr.length) %
+                arr.length
+        );
+    };
 
     return (
         <>
             <div className="relative overflow-hidden h-175 md:h-200">
                 {/* PATCH BACKGROUND */}
                 <div className="absolute inset-0 patch-bg"></div>
+
                 <div className="bg-white min-h-screen pb-20">
                     <Navbar />
 
                     <div className="mt-10 md:mt-5 text-center md:text-left">
-
                         <p className="text-[#43406e] text-4xl md:text-7xl font-extrabold font-mono md:ml-120">
                             Learn French
                         </p>
@@ -94,14 +125,11 @@ const Main = () => {
                         <p className="text-[#43406e] font-serif mt-2 text-lg md:text-2xl md:ml-130">
                             Explore and learn French in your style.
                         </p>
-
                     </div>
 
                     {/* SLIDER */}
                     <div className="md:w-full h-300 md:h-[1200px] custom-top-rounded bg-[#43406e] flex flex-col items-center justify-center relative -mt-175 md:-mt-150">
-
                         <div className="flex items-center justify-center gap-4 relative z-20">
-
                             {/* PREVIOUS */}
                             <button
                                 onClick={prev}
@@ -114,10 +142,15 @@ const Main = () => {
                             <div className="overflow-hidden w-[300px] md:w-[550px]">
                                 <div
                                     className="flex transition-transform duration-500 mt-210 md:mt-170"
-                                    style={{ transform: `translateX(-${index * 100}%)` }}
+                                    style={{
+                                        transform: `translateX(-${index * 100}%)`,
+                                    }}
                                 >
                                     {arr.map((box) => (
-                                        <div key={box.id} className="w-[300px] md:w-[550px] flex-shrink-0 flex justify-center">
+                                        <div
+                                            key={box.id}
+                                            className="w-[300px] md:w-[550px] flex-shrink-0 flex justify-center"
+                                        >
                                             {box.content}
                                         </div>
                                     ))}
@@ -131,16 +164,12 @@ const Main = () => {
                             >
                                 ›
                             </button>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-            <Footer />
 
+            <Footer />
         </>
     );
 };

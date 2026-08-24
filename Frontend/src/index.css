@@ -5,24 +5,7 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
-}
-
-.bg_image {
-    background:
-        linear-gradient(rgba(0, 0, 0, 0.6) 0%,
-            /* top darker */
-            rgba(0, 0, 0, 0.2) 40%,
-            /* center lighter */
-            rgba(0, 0, 0, 0.6) 100%),
-        url("/src/images/background.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    /* background-attachment: fixed; */
-    /* overflow: visible; */
-    min-height: 100vh;
-
-
+    scroll-behavior: smooth;
 }
 
 .bg_image {
@@ -30,6 +13,7 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    min-height: 100vh;
 }
 
 .nav:hover {
@@ -37,6 +21,7 @@ body {
     transition: 0.3s ease;
 }
 
+/* ── Existing pop-in animation ── */
 .load1 {
     transform: scale(0);
     animation: load1 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
@@ -78,6 +63,140 @@ body {
     }
 }
 
+/* ── Navbar slide-in ── */
+.navbar-anim {
+    animation: slideDown 0.6s cubic-bezier(0.22, 0.68, 0, 1.2) both;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Fade-up entrance (staggered) ── */
+.fade-up {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s cubic-bezier(0.22, 0.68, 0, 1.2),
+        transform 0.7s cubic-bezier(0.22, 0.68, 0, 1.2);
+}
+
+.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.delay-100 {
+    transition-delay: 0.10s;
+}
+
+.delay-200 {
+    transition-delay: 0.20s;
+}
+
+.delay-300 {
+    transition-delay: 0.30s;
+}
+
+.delay-400 {
+    transition-delay: 0.40s;
+}
+
+.delay-500 {
+    transition-delay: 0.50s;
+}
+
+/* ── Floating speech bubbles ── */
+.bubble {
+    animation: floatBubble 4s ease-in-out infinite;
+}
+
+@keyframes floatBubble {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* ── Hero image float ── */
+.hero-img {
+    animation: heroFloat 6s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-14px);
+    }
+}
+
+/* ── Sparkle icon spin ── */
+.sparkle-icon {
+    animation: spinSlow 8s linear infinite;
+}
+
+@keyframes spinSlow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── CTA button pulse glow ── */
+.cta-btn {
+    animation: pulseGlow 2.4s ease-in-out infinite;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cta-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+}
+
+.cta-btn:active {
+    transform: scale(0.97);
+}
+
+@keyframes pulseGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(29, 78, 216, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 12px rgba(29, 78, 216, 0);
+    }
+}
+
+/* ── Gradient logo text ── */
+.grad-text {
+    background: linear-gradient(135deg, #1d4ed8, #b91c1c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ── Existing utilities ── */
 .custom-top-rounded {
     clip-path: ellipse(100% 40% at 50% 100%);
 }
@@ -141,11 +260,7 @@ body {
         url("/src/images/patch5.png");
     background-repeat: repeat;
     background-size: 250px 250px, 200px 200px, 300px 300px, 180px 180px;
-    background-position:
-        0 0,
-        200px 150px,
-        400px 300px,
-        100px 400px;
+    background-position: 0 0, 200px 150px, 400px 300px, 100px 400px;
     opacity: 0.15;
     position: absolute;
     inset: 0;
