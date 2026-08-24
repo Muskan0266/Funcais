@@ -3,7 +3,6 @@ import User from "../models/user";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-
 interface SignupBody {
     FName: string;
     LName: string;
@@ -16,7 +15,6 @@ interface LoginBody {
     email: string;
     password: string;
 }
-
 
 export const handleSignup = async (
     req: Request<{}, {}, SignupBody>,
@@ -31,6 +29,7 @@ export const handleSignup = async (
         }
 
         const existing = await User.findOne({ email });
+
         if (existing) {
             res.status(400).json({ message: "Email already registered" });
             return;
@@ -65,7 +64,7 @@ export const handleSignup = async (
     }
 };
 
-/* ===================== LOGIN ===================== */
+// LOGIN
 
 export const handleLogin = async (
     req: Request<{}, {}, LoginBody>,
@@ -75,12 +74,14 @@ export const handleLogin = async (
         const { email, password } = req.body;
 
         const user = await User.findOne({ email });
+
         if (!user) {
             res.status(400).json({ message: "User not found" });
             return;
         }
 
         const match = await bcrypt.compare(password, user.password);
+
         if (!match) {
             res.status(400).json({ message: "Wrong password" });
             return;
@@ -89,7 +90,7 @@ export const handleLogin = async (
         const token = jwt.sign(
             { id: user._id.toString() },
             process.env.JWT_SECRET as string,
-            { expiresIn: "3d" }
+            { expiresIn: "7d" }
         );
 
         const cookieOptions = {
@@ -111,14 +112,13 @@ export const handleLogin = async (
     }
 };
 
-/* ===================== GET ME ===================== */
+// GET ME
 
 export const getMe = async (
     req: Request,
     res: Response
 ): Promise<void> => {
     try {
-        // ⚠️ TEMP FIX (will improve later)
         const userId = (req as any).userId;
 
         const user = await User.findById(userId).select("-password");
@@ -132,8 +132,6 @@ export const getMe = async (
         res.status(500).json({ message: "Server error" });
     }
 };
-
-/* ===================== SAVE PURPOSE ===================== */
 
 export const savePurpose = async (
     req: Request,
@@ -155,7 +153,7 @@ export const savePurpose = async (
     }
 };
 
-/* ===================== SAVE LEVEL ===================== */
+// SAVE LEVEL
 
 export const saveLevel = async (
     req: Request,
@@ -177,7 +175,7 @@ export const saveLevel = async (
     }
 };
 
-/* ===================== EDIT PROFILE ===================== */
+// EDIT PROFILE
 
 export const editProfile = async (
     req: Request,
@@ -189,7 +187,12 @@ export const editProfile = async (
 
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            { FName, LName, level: Level, date: Date },
+            {
+                FName,
+                LName,
+                level: Level,
+                date: Date,
+            },
             { new: true }
         ).select("-password");
 
@@ -203,12 +206,15 @@ export const editProfile = async (
     }
 };
 
-/* ===================== LOGOUT ===================== */
+// LOGOUT
 
 export const handleLogout = (
     req: Request,
     res: Response
 ): void => {
     res.clearCookie("token");
-    res.json({ message: "Logged out successfully" });
+
+    res.json({
+        message: "Logged out successfully",
+    });
 };
